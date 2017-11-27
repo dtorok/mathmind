@@ -9018,9 +9018,40 @@ var _elm_lang$html$Html_Events$Options = F2(
 	function (a, b) {
 		return {stopPropagation: a, preventDefault: b};
 	});
+var _user$project$Exercise$execute = F3(
+	function (num1, op, num2) {
+		var _p0 = op;
+		return num1 + num2;
+	});
 var _user$project$Exercise$op2str = function (op) {
-	var _p0 = op;
+	var _p1 = op;
 	return '+';
+};
+var _user$project$Exercise$viewEvaluation = function (model) {
+	var content = function () {
+		var _p2 = model.evaluation;
+		switch (_p2.ctor) {
+			case 'Correct':
+				return 'OK';
+			case 'Wrong':
+				return 'Wrong';
+			default:
+				return '';
+		}
+	}();
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('evaluation'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], ' ', content)),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Exercise$viewExercise = function (model) {
 	return _elm_lang$html$Html$text(
@@ -9041,9 +9072,9 @@ var _user$project$Exercise$viewExercise = function (model) {
 							_elm_lang$core$Basics$toString(model.num2),
 							' = '))))));
 };
-var _user$project$Exercise$Model = F4(
-	function (a, b, c, d) {
-		return {num1: a, num2: b, op: c, result: d};
+var _user$project$Exercise$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {num1: a, num2: b, result: c, op: d, input: e, evaluation: f};
 	});
 var _user$project$Exercise$Add = {ctor: 'Add'};
 var _user$project$Exercise$Wrong = {ctor: 'Wrong'};
@@ -9051,7 +9082,14 @@ var _user$project$Exercise$Correct = {ctor: 'Correct'};
 var _user$project$Exercise$None = {ctor: 'None'};
 var _user$project$Exercise$createModel = F3(
 	function (num1, op, num2) {
-		return {num1: num1, num2: num2, op: op, result: _user$project$Exercise$None};
+		return {
+			num1: num1,
+			num2: num2,
+			result: A3(_user$project$Exercise$execute, num1, op, num2),
+			op: op,
+			input: '',
+			evaluation: _user$project$Exercise$None
+		};
 	});
 var _user$project$Exercise$initWithData = F3(
 	function (num1, op, num2) {
@@ -9063,17 +9101,35 @@ var _user$project$Exercise$initWithData = F3(
 	});
 var _user$project$Exercise$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'Noop':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Init':
-				var model = A3(_user$project$Exercise$createModel, _p1._0._0, _user$project$Exercise$Add, _p1._0._1);
+				var model = A3(_user$project$Exercise$createModel, _p3._0._0, _user$project$Exercise$Add, _p3._0._1);
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Input':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{input: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				var evaluation = _elm_lang$core$Native_Utils.eq(
+					model.input,
+					_elm_lang$core$Basics$toString(model.result)) ? _user$project$Exercise$Correct : _user$project$Exercise$Wrong;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{evaluation: evaluation}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
+var _user$project$Exercise$Submit = {ctor: 'Submit'};
 var _user$project$Exercise$Input = function (a) {
 	return {ctor: 'Input', _0: a};
 };
@@ -9087,19 +9143,34 @@ var _user$project$Exercise$view = function (model) {
 		},
 		{
 			ctor: '::',
-			_0: _user$project$Exercise$viewExercise(model),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					{
+			_0: A2(
+				_elm_lang$html$Html$form,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onSubmit(_user$project$Exercise$Submit),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$Exercise$viewExercise(model),
+					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$Exercise$Input),
-						_1: {ctor: '[]'}
-					},
-					{ctor: '[]'}),
-				_1: {ctor: '[]'}
-			}
+						_0: A2(
+							_elm_lang$html$Html$input,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$Exercise$Input),
+								_1: {ctor: '[]'}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Exercise$viewEvaluation(model),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$Exercise$Init = function (a) {

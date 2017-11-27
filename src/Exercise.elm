@@ -2,29 +2,33 @@ module Exercise exposing (..)
 
 import Random exposing (pair, int)
 
-import Html exposing (Html, div, input, text)
+import Html exposing (Html, div, input, text, form)
 import Html.Attributes exposing (class)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onSubmit)
 
 
 -----
 -- MODEL
 type Operator = Add
-type Result = None | Correct | Wrong
+type Evaluation = None | Correct | Wrong
 
 type alias Model = {
   num1: Int,
   num2: Int,
+  result: Int,
   op: Operator,
-  result: Result
+  input : String,
+  evaluation: Evaluation
 }
 
 createModel : Int -> Operator -> Int -> Model
 createModel num1 op num2 =
   { num1 = num1
   , num2 = num2
+  , result = execute num1 op num2
   , op = op
-  , result = None }
+  , input = ""
+  , evaluation = None }
 
 
 -----
@@ -43,7 +47,7 @@ init =
 
 -----
 -- MESSAGES
-type Msg = Noop | Init (Int, Int) | Input String
+type Msg = Noop | Init (Int, Int) | Input String | Submit
 
 
 -----
@@ -57,7 +61,16 @@ update msg model =
       let model = createModel n1 Add n2
       in (model, Cmd.none)
     Input value ->
-      (model, Cmd.none)
+      ( { model | input = value }, Cmd.none)
+    Submit ->
+      let
+        evaluation =
+          if model.input == (toString model.result) then
+            Correct
+          else
+            Wrong
+      in
+        ( { model | evaluation = evaluation }, Cmd.none )
 
 
 -----
@@ -65,11 +78,25 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div [ class "exercise" ]
-  [ viewExercise model
-  , input [ onInput Input ] [] ]
+    [ form [onSubmit Submit]
+      [
+        viewExercise model
+      , input [ onInput Input ] []
+      , viewEvaluation model
+      ]
+    ]
 
 viewExercise : Model -> Html msg
 viewExercise model = text <| (toString model.num1) ++ " " ++ (op2str model.op) ++ " " ++ (toString model.num2) ++ " = "
+
+viewEvaluation : Model -> Html msg
+viewEvaluation model =
+  let content = case model.evaluation of
+    Correct -> "OK"
+    Wrong -> "Wrong"
+    None -> ""
+  in
+    div [ class "evaluation" ] [text <| " " ++ content]
 
 
 -----
@@ -78,3 +105,8 @@ op2str : Operator -> String
 op2str op =
   case op of
     Add -> "+"
+
+execute : Int -> Operator -> Int -> Int
+execute num1 op num2 =
+  case op of
+    Add -> num1 + num2

@@ -1,3 +1,4 @@
 body { padding: 100px; }
-div.exercise { font-size: 48px; padding: 50px; border: 1px dotted black; display: inline; }
+div.exercise { font-size: 48px; padding: 50px; border: 1px dotted black; }
 div.exercise input { font-size: 48px; width: 80px}
+div.exercise div.evaluation { display: inline }
