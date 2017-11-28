@@ -12,13 +12,13 @@ import Html.Events exposing (onInput, onSubmit)
 type Operator = Add
 type Evaluation = None | Correct | Wrong
 
-type alias Model = {
-  num1: Int,
-  num2: Int,
-  result: Int,
-  op: Operator,
-  input : String,
-  evaluation: Evaluation
+type alias Model =
+  { num1: Int
+  , num2: Int
+  , result: Int
+  , op: Operator
+  , input : String
+  , evaluation: Evaluation
 }
 
 createModel : Int -> Operator -> Int -> Model
@@ -45,9 +45,16 @@ init =
   in
     ( model, gen )
 
+
 -----
 -- MESSAGES
 type Msg = Noop | Init (Int, Int) | Input String | Submit
+
+
+-----
+-- API
+isCorrect : Model -> Bool
+isCorrect model = model.evaluation == Correct
 
 
 -----

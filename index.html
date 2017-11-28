@@ -9079,6 +9079,9 @@ var _user$project$Exercise$Model = F6(
 var _user$project$Exercise$Add = {ctor: 'Add'};
 var _user$project$Exercise$Wrong = {ctor: 'Wrong'};
 var _user$project$Exercise$Correct = {ctor: 'Correct'};
+var _user$project$Exercise$isCorrect = function (model) {
+	return _elm_lang$core$Native_Utils.eq(model.evaluation, _user$project$Exercise$Correct);
+};
 var _user$project$Exercise$None = {ctor: 'None'};
 var _user$project$Exercise$createModel = F3(
 	function (num1, op, num2) {
@@ -9211,6 +9214,20 @@ var _user$project$App$stylesheet = function () {
 		attrs,
 		{ctor: '[]'});
 }();
+var _user$project$App$batchCmd = F2(
+	function (fMsg, cmds) {
+		return _elm_lang$core$Platform_Cmd$batch(
+			A2(
+				_elm_lang$core$List$indexedMap,
+				F2(
+					function (i, cmd) {
+						return A2(
+							_elm_lang$core$Platform_Cmd$map,
+							fMsg(i),
+							cmd);
+					}),
+				cmds));
+	});
 var _user$project$App$convCmd = F3(
 	function (fModel, fCmd, _p0) {
 		var _p1 = _p0;
@@ -9223,18 +9240,30 @@ var _user$project$App$convCmd = F3(
 var _user$project$App$ExModel = function (a) {
 	return {ctor: 'ExModel', _0: a};
 };
-var _user$project$App$ExMsg = function (a) {
-	return {ctor: 'ExMsg', _0: a};
-};
-var _user$project$App$init = A3(_user$project$App$convCmd, _user$project$App$ExModel, _user$project$App$ExMsg, _user$project$Exercise$init);
-var _user$project$App$viewExercise = function (model) {
-	var html = _user$project$Exercise$view(model);
-	return A2(_elm_lang$html$Html$map, _user$project$App$ExMsg, html);
-};
+var _user$project$App$ExMsg = F2(
+	function (a, b) {
+		return {ctor: 'ExMsg', _0: a, _1: b};
+	});
+var _user$project$App$init = A2(
+	_elm_lang$core$Tuple$mapSecond,
+	_user$project$App$batchCmd(_user$project$App$ExMsg),
+	A2(
+		_elm_lang$core$Tuple$mapFirst,
+		_user$project$App$ExModel,
+		_elm_lang$core$List$unzip(
+			A2(_elm_lang$core$List$repeat, 3, _user$project$Exercise$init))));
+var _user$project$App$viewExercise = F2(
+	function (index, model) {
+		var html = _user$project$Exercise$view(model);
+		return A2(
+			_elm_lang$html$Html$map,
+			_user$project$App$ExMsg(index),
+			html);
+	});
 var _user$project$App$view = function (model) {
 	var content = function () {
 		var _p2 = model;
-		return _user$project$App$viewExercise(_p2._0);
+		return A2(_elm_lang$core$List$indexedMap, _user$project$App$viewExercise, _p2._0);
 	}();
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9244,7 +9273,10 @@ var _user$project$App$view = function (model) {
 			_0: _user$project$App$stylesheet,
 			_1: {
 				ctor: '::',
-				_0: content,
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					content),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -9253,11 +9285,20 @@ var _user$project$App$update = F2(
 	function (msg, model) {
 		var _p3 = {ctor: '_Tuple2', _0: msg, _1: model};
 		if (_p3._0.ctor === 'ExMsg') {
-			return A3(
-				_user$project$App$convCmd,
-				_user$project$App$ExModel,
-				_user$project$App$ExMsg,
-				A2(_user$project$Exercise$update, _p3._0._0, _p3._1._0));
+			return A2(
+				_elm_lang$core$Tuple$mapSecond,
+				_user$project$App$batchCmd(_user$project$App$ExMsg),
+				A2(
+					_elm_lang$core$Tuple$mapFirst,
+					_user$project$App$ExModel,
+					_elm_lang$core$List$unzip(
+						A2(
+							_elm_lang$core$List$indexedMap,
+							F2(
+								function (i, exModel) {
+									return _elm_lang$core$Native_Utils.eq(i, _p3._0._0) ? A2(_user$project$Exercise$update, _p3._0._1, exModel) : {ctor: '_Tuple2', _0: exModel, _1: _elm_lang$core$Platform_Cmd$none};
+								}),
+							_p3._1._0))));
 		} else {
 			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
