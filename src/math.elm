@@ -78,18 +78,7 @@ update msg model =
     case (msg, model) of
         (ExMsg index exMsg, ExModel exModels) ->
           exModels
-            |> List.indexedMap (\ i exModel ->
-              if i == index then
-                case Exercise.update exMsg exModel of
-                  (m, c) ->
-                    (m,
-                    if Exercise.isCorrect m
-                      then Task.attempt (always NoOp) (Dom.focus (index2id (i + 1)))
-                      else Cmd.map (ExMsg i) c
-                    )
-              else
-                (exModel, Cmd.none)
-              )
+            |> List.indexedMap (indexedExerciseUpdate index exMsg)
             |> List.unzip
             |> Tuple.mapFirst ExModel
             |> Tuple.mapSecond Cmd.batch
@@ -98,6 +87,18 @@ update msg model =
         (_, _) ->
             ( model, Cmd.none )
 
+indexedExerciseUpdate : Int -> Exercise.Msg -> Int -> Exercise.Model -> (Exercise.Model, Cmd Msg)
+indexedExerciseUpdate index exMsg i exModel =
+  if i == index then
+    case Exercise.update exMsg exModel of
+      (m, c) ->
+        (m,
+        if Exercise.isCorrect m
+          then Task.attempt (always NoOp) (Dom.focus (index2id (i + 1)))
+          else Cmd.map (ExMsg i) c
+        )
+  else
+    (exModel, Cmd.none)
 
 -----
 -- SUBSCRIPTIONS
