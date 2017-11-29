@@ -3,7 +3,7 @@ module Exercise exposing (..)
 import Random exposing (pair, int)
 
 import Html exposing (Html, div, input, text, form)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, id)
 import Html.Events exposing (onInput, onSubmit)
 
 
@@ -13,7 +13,8 @@ type Operator = Add
 type Evaluation = None | Correct | Wrong
 
 type alias Model =
-  { num1: Int
+  { id: String
+  , num1: Int
   , num2: Int
   , result: Int
   , op: Operator
@@ -21,9 +22,10 @@ type alias Model =
   , evaluation: Evaluation
 }
 
-createModel : Int -> Operator -> Int -> Model
-createModel num1 op num2 =
-  { num1 = num1
+createModel : String -> Int -> Operator -> Int -> Model
+createModel id num1 op num2 =
+  { id = id
+  , num1 = num1
   , num2 = num2
   , result = execute num1 op num2
   , op = op
@@ -33,22 +35,22 @@ createModel num1 op num2 =
 
 -----
 -- INIT
-initWithData : Int -> Operator -> Int -> (Model, Cmd Msg)
-initWithData num1 op num2 =
-  (createModel num1 op num2, Cmd.none)
+initWithData : String -> Int -> Operator -> Int -> (Model, Cmd Msg)
+initWithData id num1 op num2 =
+  (createModel id num1 op num2, Cmd.none)
 
-init : (Model, Cmd Msg)
-init =
+init : String -> (Model, Cmd Msg)
+init id =
   let
-    model = createModel 0 Add 0
-    gen = Random.generate Init <| pair (int 0  9) (int 0 9)
+    model = createModel id 0 Add 0
+    gen = Random.generate (Init id) <| pair (int 0  9) (int 0 9)
   in
     ( model, gen )
 
 
 -----
 -- MESSAGES
-type Msg = Noop | Init (Int, Int) | Input String | Submit
+type Msg = Noop | Init String (Int, Int) | Input String | Submit
 
 
 -----
@@ -64,8 +66,8 @@ update msg model =
   case msg of
     Noop ->
       (model, Cmd.none)
-    Init (n1, n2) ->
-      let model = createModel n1 Add n2
+    Init id (n1, n2) ->
+      let model = createModel id n1 Add n2
       in (model, Cmd.none)
     Input value ->
       ( { model | input = value }, Cmd.none)
@@ -88,7 +90,7 @@ view model =
     [ form [onSubmit Submit]
       [
         viewExercise model
-      , input [ onInput Input ] []
+      , input [ onInput Input, id model.id ] []
       , viewEvaluation model
       ]
     ]

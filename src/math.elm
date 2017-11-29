@@ -1,6 +1,8 @@
 module App exposing (..)
 
 import Tuple
+import Task
+import Dom
 
 import Html exposing (Html, div, text, program, node)
 import Html.Attributes exposing (attribute)
@@ -24,7 +26,9 @@ batchCmd fMsg cmds = cmds
 
 init : ( Model, Cmd Msg )
 init =
-  List.repeat 3 Exercise.init
+  List.repeat 3 1
+    |> List.indexedMap (\i _ -> index2id i)
+    |> List.map Exercise.init
     |> List.unzip
     |> Tuple.mapFirst ExModel
     |> Tuple.mapSecond (batchCmd ExMsg)
@@ -35,6 +39,7 @@ init =
 type Msg
     = NoOp
     | ExMsg Int Exercise.Msg
+    | NextExercise Int
 
 
 -----
@@ -75,13 +80,21 @@ update msg model =
           exModels
             |> List.indexedMap (\ i exModel ->
               if i == index then
-                Exercise.update exMsg exModel
+                case Exercise.update exMsg exModel of
+                  (m, c) ->
+                    (m,
+                    if Exercise.isCorrect m
+                      then Task.attempt (always NoOp) (Dom.focus (index2id (i + 1)))
+                      else Cmd.map (ExMsg i) c
+                    )
               else
                 (exModel, Cmd.none)
               )
             |> List.unzip
             |> Tuple.mapFirst ExModel
-            |> Tuple.mapSecond (batchCmd ExMsg)
+            |> Tuple.mapSecond Cmd.batch
+        (NextExercise index, ExModel exModels) ->
+          Debug.log ("NextExercise" ++ (toString index)) (model, Cmd.none)
         (_, _) ->
             ( model, Cmd.none )
 
@@ -92,6 +105,11 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
 
+
+-----
+-- HELPERS
+index2id : Int -> String
+index2id index = "input" ++ (toString index)
 
 -----
 -- MAIN
