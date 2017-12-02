@@ -2,3 +2,9 @@ body { padding: 100px; }
 div.exercise { font-size: 48px; padding: 50px; border: 1px dotted black; }
 div.exercise input { font-size: 48px; width: 80px}
 div.exercise div.evaluation { display: inline }
+
+div.puzzle img { position: absolute; }
+div.puzzle table { position: absolute; }
+div.puzzle div.exercise { position: absolute; background-color: yellow; margin: 100px; }
+div.puzzle table tr td.hidden { background-color: white;}
+div.puzzle table tr td.chosen { background-color: gray;}
