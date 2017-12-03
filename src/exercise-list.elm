@@ -100,6 +100,7 @@ indexedExerciseUpdate index exMsg i exModel =
   else
     (exModel, Cmd.none)
 
+
 -----
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -111,6 +112,7 @@ subscriptions model =
 -- HELPERS
 index2id : Int -> String
 index2id index = "input" ++ (toString index)
+
 
 -----
 -- MAIN
