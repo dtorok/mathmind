@@ -43,7 +43,7 @@ init : String -> (Model, Cmd Msg)
 init id =
   let
     model = createModel id 0 Add 0
-    gen = Random.generate (Init id) <| pair (int 0  9) (int 0 9)
+    gen = Random.generate (Init id) <| pair (int 3  9) (int 0 9)
   in
     ( model, gen )
 
