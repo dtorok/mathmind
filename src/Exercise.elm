@@ -1,6 +1,6 @@
 module Exercise exposing (..)
 
-import Random exposing (pair, int)
+import Random exposing (pair, int, andThen, Generator, map)
 
 import Html exposing (Html, div, input, text, form)
 import Html.Attributes exposing (class, id)
@@ -9,8 +9,16 @@ import Html.Events exposing (onInput, onSubmit)
 
 -----
 -- MODEL
-type Operator = Add
+type Operator = Add | Sub
 type Evaluation = None | Correct | Wrong
+type ExerciseType = Addition | Subtraction
+
+
+exerciseTypes : List ExerciseType
+exerciseTypes =
+  [ Addition
+  , Subtraction
+  ]
 
 type alias Model =
   { id: String
@@ -43,14 +51,31 @@ init : String -> (Model, Cmd Msg)
 init id =
   let
     model = createModel id 0 Add 0
-    gen = Random.generate (Init id) <| pair (int 3  9) (int 0 9)
+    gen = Random.generate (Init id)
+      (  int 0 ((List.length exerciseTypes) - 1)
+      |> map index2type
+      |> andThen generateByType
+      )
   in
     ( model, gen )
+
+generateByType : ExerciseType -> Generator (Int, Operator, Int)
+generateByType t =
+  let op = type2op t
+      result (n1, n2) = (n1, op, n2)
+  in case t of
+    Addition ->
+      pair (int 3 9) (int 0 9)
+        |> map result
+    Subtraction ->
+      pair (int 2 9) (int 2 9)
+        |> map (\(a, b) -> (a + b, b))
+        |> map result
 
 
 -----
 -- MESSAGES
-type Msg = Noop | Init String (Int, Int) | Input String | Submit
+type Msg = Noop | Init String (Int, Operator, Int) | Input String | Submit
 
 
 -----
@@ -66,8 +91,8 @@ update msg model =
   case msg of
     Noop ->
       (model, Cmd.none)
-    Init id (n1, n2) ->
-      let model = createModel id n1 Add n2
+    Init id (n1, op, n2) ->
+      let model = createModel id n1 op n2
       in (model, Cmd.none)
     Input value ->
       ( { model | input = value }, Cmd.none)
@@ -114,8 +139,25 @@ op2str : Operator -> String
 op2str op =
   case op of
     Add -> "+"
+    Sub -> "-"
+
+type2op : ExerciseType -> Operator
+type2op t =
+  case t of
+    Addition -> Add
+    Subtraction -> Sub
+
+orderTuple : (Int, Int) -> (Int, Int)
+orderTuple (a, b) = (max a b, min a b)
+
+index2type : Int -> ExerciseType
+index2type i
+  =  List.drop i exerciseTypes
+  |> List.head
+  |> Maybe.withDefault Addition
 
 execute : Int -> Operator -> Int -> Int
 execute num1 op num2 =
   case op of
     Add -> num1 + num2
+    Sub -> num1 - num2
