@@ -3,10 +3,19 @@ div.exercise { font-size: 48px; padding: 50px; border: 1px dotted black; }
 div.exercise input { font-size: 48px; width: 80px}
 div.exercise div.evaluation { display: inline }
 
-div.puzzle img.image { position: absolute; border: 1px solid gray; }
-div.puzzle table { position: absolute; }
-div.puzzle div.images { border: 1px dotted black; float: right; }
-div.puzzle div.images div.thumbnail { cursor: pointer; border: 1px solid black; width: 50px; height: 50px; font-size: 35px; text-align: center; font-weight: bold; padding-top: 15%; margin: 10px; }
+
+div.puzzle div.images { height: 120px; }
+div.puzzle div.images div.thumbnail {
+  cursor: pointer; border: 1px solid black;
+  width: 50px; height: 50px;
+  font-size: 35px; text-align: center; font-weight: bold;
+  padding-top: 15px; margin: 10px; float: left; }
+
+div.puzzle div.image { position: relative; }
+
+div.puzzle div.image img.image { position: absolute; border: 1px solid gray; }
+div.puzzle div.image table { position: absolute; }
+
 div.puzzle div.exercise { position: absolute; background-color: yellow; margin: 100px; }
 div.puzzle table tr td { cursor: pointer; }
 div.puzzle table tr td.hidden { background-color: white;}

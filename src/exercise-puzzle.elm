@@ -118,8 +118,7 @@ view model =
   div [class "puzzle"]
     [ stylesheet
     , viewImages model
-    , viewImage model
-    , viewTable model
+    , viewImageAndTable model
     , viewExercise model
     , viewFireworks model
     ]
@@ -133,6 +132,13 @@ viewImages model =
         \i img -> div [class "thumbnail", onClick (ChooseImage i)] [ text (getContent i img) ]
       )
     )
+
+viewImageAndTable : Model -> Html Msg
+viewImageAndTable model =
+  div [ class "image" ]
+    [ viewImage model
+    , viewTable model
+    ]
 
 viewImage : Model -> Html Msg
 viewImage model =
