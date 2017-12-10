@@ -13,8 +13,8 @@ import Exercise
 images : List Image
 images =
   [ initImage "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
-  , initImage "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest?cb=20100908144748" 1024 768 3 4
-  , initImage "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest?cb=20130710175209" 1920 816 3 6
+  , initImage "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
+  , initImage "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
   , initImage "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
   , initImage "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
   , initImage "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
