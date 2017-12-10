@@ -20,7 +20,6 @@ div.puzzle div.exercise { position: absolute; background-color: yellow; margin: 
 div.puzzle table tr td { cursor: pointer; }
 div.puzzle table tr td.hidden { background-color: white;}
 div.puzzle table tr td.chosen { background-color: gray;}
-/* div.puzzle div.fireworks { position: absolute; top: 50%; left: 50%; margin: -200px 0px 0px -300px } */
 div.puzzle div.fireworks { position: absolute; top: 150px; left: 350px; }
 div.puzzle div.fireworks img { width: 600px; }
 

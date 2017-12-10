@@ -12,18 +12,29 @@ import Exercise
 -- DATABASE
 images : List Image
 images =
-  -- [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
-  [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 1 1
-  , initImage "https://i.ytimg.com/vi/IdptgB2a7xA/maxresdefault.jpg" 1280 720 4 6
-  , initImage "https://static01.nyt.com/images/2016/04/23/movies/video-agent-fox/video-agent-fox-videoSixteenByNine1050.jpg" 1050 591 3 4
-  , initImage "http://pre07.deviantart.net/1881/th/pre/f/2017/142/1/f/sahara_ajar_gary_by_giuseppedirosso-dba3ys1.jpg" 1385 577 3 3
-  , initImage "http://assets1.ignimgs.com/2017/08/08/00---intro-1502235223391_1280w.jpg" 1280 720 4 6
-  , initImage "http://images5.fanpop.com/image/photos/29500000/Po-vs-Shen-kung-fu-panda-2-29569311-1078-741.png" 1078 741 4 4
-  , initImage "http://3.bp.blogspot.com/-OCAFi2IC8-Y/VqxdMPD8MGI/AAAAAAAADK8/6L8FhecuRVQ/s1600/%25E8%259E%25A2%25E5%25B9%2595%25E5%25BF%25AB%25E7%2585%25A7%2B2016-01-30%2B%25E4%25B8%258B%25E5%258D%25882.50.04.png" 1316 650 3 5
-  , initImage "http://www.boomerang.asia/dynamic/show/00000000/472/601e449754dfa1e05f84e34cce2ca3a6.jpg" 1230 603 4 7
-  , initImage "https://i.ytimg.com/vi/r6fx5C_YcKM/maxresdefault.jpg" 1280 720 5 5
-  , initImage "http://m.cdn.blog.hu/sm/smokingbarrels/image/vuk.jpg" 1280 720 4 3
+  [ initImage "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
+  , initImage "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest?cb=20100908144748" 1024 768 3 4
+  , initImage "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest?cb=20130710175209" 1920 816 3 6
+  , initImage "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
+  , initImage "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
+  , initImage "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
+  , initImage "https://pbs.twimg.com/media/DNK_RxWX0AEjkBg.jpg" 1000 418 3 3
+  , initImage "https://i1.wp.com/www.tor.com/wp-content/uploads/2016/01/calvin-hobbes-tfa-spaceman-finn.jpg?resize=625%2C625&type=vertical" 625 625 3 3
+  , initImage "https://quintype-01.imgix.net/thequint%2F2016-04%2Ff9b095be-760d-422a-8652-da8896835a79%2Ftumblr_lum55wl03h1qiol6o1.gif?q=35&auto=format&w=1200" 1200 511 4 6
+  , initImage "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/07/16/kylo-darth-calvin-hobbes.jpg" 1172 806 5 5
   ]
+
+  -- [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
+  -- , initImage "https://i.ytimg.com/vi/IdptgB2a7xA/maxresdefault.jpg" 1280 720 4 6
+  -- , initImage "https://static01.nyt.com/images/2016/04/23/movies/video-agent-fox/video-agent-fox-videoSixteenByNine1050.jpg" 1050 591 3 4
+  -- , initImage "http://pre07.deviantart.net/1881/th/pre/f/2017/142/1/f/sahara_ajar_gary_by_giuseppedirosso-dba3ys1.jpg" 1385 577 3 3
+  -- , initImage "http://assets1.ignimgs.com/2017/08/08/00---intro-1502235223391_1280w.jpg" 1280 720 4 6
+  -- , initImage "http://images5.fanpop.com/image/photos/29500000/Po-vs-Shen-kung-fu-panda-2-29569311-1078-741.png" 1078 741 4 4
+  -- , initImage "http://3.bp.blogspot.com/-OCAFi2IC8-Y/VqxdMPD8MGI/AAAAAAAADK8/6L8FhecuRVQ/s1600/%25E8%259E%25A2%25E5%25B9%2595%25E5%25BF%25AB%25E7%2585%25A7%2B2016-01-30%2B%25E4%25B8%258B%25E5%258D%25882.50.04.png" 1316 650 3 5
+  -- , initImage "http://www.boomerang.asia/dynamic/show/00000000/472/601e449754dfa1e05f84e34cce2ca3a6.jpg" 1230 603 4 7
+  -- , initImage "https://i.ytimg.com/vi/r6fx5C_YcKM/maxresdefault.jpg" 1280 720 5 5
+  -- , initImage "http://m.cdn.blog.hu/sm/smokingbarrels/image/vuk.jpg" 1280 720 4 3
+  -- ]
 
   -- [ initImage "https://i.ytimg.com/vi/GCqECajz920/maxresdefault.jpg" 1280 720 5 6
   -- , initImage "https://assets.halfbrick.com/wp-content/uploads/New-Characters.jpg" 1024 768 3 3
@@ -117,6 +128,7 @@ view : Model -> Html Msg
 view model =
   div [class "puzzle"]
     [ stylesheet
+    -- , viewImageUrl model
     , viewImages model
     , viewImageAndTable model
     , viewExercise model
@@ -132,6 +144,9 @@ viewImages model =
         \i img -> div [class "thumbnail", onClick (ChooseImage i)] [ text (getContent i img) ]
       )
     )
+
+viewImageUrl : Model -> Html Msg
+viewImageUrl model = div [] [ text model.image.url ]
 
 viewImageAndTable : Model -> Html Msg
 viewImageAndTable model =
