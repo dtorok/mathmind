@@ -5,7 +5,7 @@ dist: build
 	rm -rf dist
 	mkdir dist
 	cp index.html dist/
-	cp css.css dist/
+	cp -r resources dist/
 
 deploy: dist
 	firebase deploy

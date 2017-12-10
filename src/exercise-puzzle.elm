@@ -183,7 +183,7 @@ stylesheet =
         attrs =
             [ attribute "rel"       "stylesheet"
             , attribute "property"  "stylesheet"
-            , attribute "href"      "css.css"
+            , attribute "href"      "resources/css.css"
             ]
     in
         node "link" attrs []
