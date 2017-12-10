@@ -62,7 +62,8 @@ type alias Image =
   }
 
 type alias Model =
-  { image: Image
+  { imageIndex: Int
+  , image: Image
   , chosen: Maybe Coord
   , exModel: Maybe Exercise.Model
   , board: Board
@@ -78,7 +79,8 @@ init index =
       case img of
         Nothing -> Debug.crash "invalid image index..."
         Just image ->
-          { image = image
+          { imageIndex = index
+          , image = image
           , chosen = Nothing
           , exModel = Nothing
           , board = List.repeat image.rows <| List.repeat image.cols Hidden
@@ -138,10 +140,14 @@ view model =
 viewImages : Model -> Html Msg
 viewImages model =
   let getContent i img = toString i
+      getThumbClass i =
+        if i == model.imageIndex
+          then class "thumbnail selected"
+          else class "thumbnail"
   in
     div [ class "images" ] (
       images |> List.indexedMap (
-        \i img -> div [class "thumbnail", onClick (ChooseImage i)] [ text (getContent i img) ]
+        \i img -> div [getThumbClass i, onClick (ChooseImage i)] [ text (getContent i img) ]
       )
     )
 
