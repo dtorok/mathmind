@@ -12,7 +12,8 @@ import Exercise
 -- DATABASE
 images : List Image
 images =
-  [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
+  -- [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
+  [ initImage "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 1 1
   , initImage "https://i.ytimg.com/vi/IdptgB2a7xA/maxresdefault.jpg" 1280 720 4 6
   , initImage "https://static01.nyt.com/images/2016/04/23/movies/video-agent-fox/video-agent-fox-videoSixteenByNine1050.jpg" 1050 591 3 4
   , initImage "http://pre07.deviantart.net/1881/th/pre/f/2017/142/1/f/sahara_ajar_gary_by_giuseppedirosso-dba3ys1.jpg" 1385 577 3 3
@@ -54,6 +55,8 @@ type alias Model =
   , chosen: Maybe Coord
   , exModel: Maybe Exercise.Model
   , board: Board
+  , uncoveredFields: Int
+  , fireworks: Maybe String
   }
 
 init : Int -> (Model, Cmd Msg)
@@ -68,6 +71,8 @@ init index =
           , chosen = Nothing
           , exModel = Nothing
           , board = List.repeat image.rows <| List.repeat image.cols Hidden
+          , uncoveredFields = image.rows * image.cols
+          , fireworks = Nothing
           }
   in
     (model, Cmd.none)
@@ -116,6 +121,7 @@ view model =
     , viewImage model
     , viewTable model
     , viewExercise model
+    , viewFireworks model
     ]
 
 viewImages : Model -> Html Msg
@@ -130,7 +136,7 @@ viewImages model =
 
 viewImage : Model -> Html Msg
 viewImage model =
-  img [ src model.image.url ] []
+  img [ class "image", src model.image.url ] []
 
 viewTable : Model -> Html Msg
 viewTable model =
@@ -162,6 +168,14 @@ viewExercise model =
       let exHtml = Exercise.view exModel
       in Html.map ExMsg exHtml
 
+viewFireworks : Model -> Html Msg
+viewFireworks model =
+  case model.fireworks of
+    Nothing -> text ""
+    Just res ->
+      div [class "fireworks"] [
+        img [src ("resources/" ++ res)] []
+      ]
 
 stylesheet : Html msg
 stylesheet =
@@ -202,7 +216,10 @@ update msg model =
                      | exModel = Just exModel_}
           in
             if Exercise.isCorrect exModel_ then
-              updateExerciseCorrect model
+              (model, Cmd.none)
+              |> andThen updateExerciseCorrect
+              |> andThen updateUncoveredFields
+              |> andThen updateFireworks
             else
               ( model_, Cmd.map ExMsg exCmd )
     ChooseImage index ->
@@ -215,6 +232,24 @@ updateExerciseCorrect model =
             | exModel = Nothing
             , chosen = Nothing
             , board = makeVisible model.board model.chosen }
+  in
+    (model_, Cmd.none)
+
+updateUncoveredFields : Model -> (Model, Cmd Msg)
+updateUncoveredFields model =
+  let
+    model_ = { model
+             | uncoveredFields = model.uncoveredFields - 1 }
+  in
+    (model_, Cmd.none)
+
+updateFireworks : Model -> (Model, Cmd Msg)
+updateFireworks model =
+  let model_ =
+    if model.uncoveredFields == 0 then
+      { model | fireworks = Just "fireworks1.gif" }
+    else
+      model
   in
     (model_, Cmd.none)
 
@@ -237,9 +272,15 @@ itemAt list index =
       else
         itemAt xs (index - 1)
 
+andThen : (Model -> (Model, Cmd a)) -> (Model, Cmd a) -> (Model, Cmd a)
+andThen f (model, cmd) =
+  let (model_, cmd_) = f model
+  in (model_, Cmd.batch [cmd, cmd_])
+
 
 -----
 -- MAIN
+-- main = images |> List.map (\i -> i.rows * i.cols) |> List.sum |> toString |> text
 main : Program Never Model Msg
 main =
     program
