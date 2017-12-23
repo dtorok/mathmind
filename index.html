@@ -16,6 +16,7 @@
     });
 
     function doneImages(doneImages) {
+      console.log("iamges are done: " + doneImages)
       app.ports.doneImages.send(doneImages);
     }
 

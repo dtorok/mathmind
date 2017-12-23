@@ -5,12 +5,14 @@ div.exercise div.evaluation { display: inline }
 
 
 div.puzzle div.images { height: 120px; }
-div.puzzle div.selected { background-color: gray; color: white; }
 div.puzzle div.images div.thumbnail {
   cursor: pointer; border: 1px solid black;
   width: 50px; height: 50px;
   font-size: 35px; text-align: center; font-weight: bold;
-  padding-top: 15px; margin: 10px; float: left; }
+  padding-top: 15px; margin: 10px; float: left;
+}
+div.puzzle div.images div.done { background-color: gray; color: white; }
+div.puzzle div.images div.selected { border: 3px solid black; }
 
 div.puzzle div.image { position: relative; }
 

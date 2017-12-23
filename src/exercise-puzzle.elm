@@ -13,7 +13,7 @@ import Database
 -- DATABASE
 images : List Image
 images =
-  [ initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 1 1 -- 3 3
+  [ initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
   , initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
   , initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
   , initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
@@ -63,15 +63,25 @@ type alias Image =
   , cols: Int
   }
 
-type alias Model =
-  { imageIndex: Int
-  , image: Image
+type alias Exercise =
+  { image: Image
   , chosen: Maybe Coord
   , exModel: Maybe Exercise.Model
   , board: Board
   , uncoveredFields: Int
+  }
+
+type alias Model =
+  { imageIndex: Int
+  , doneImages: List String
+  , exercise: Exercise
   , fireworks: Maybe String
   }
+
+initGame : (Model, Cmd Msg)
+initGame =
+  let (model, cmd) = init 0
+  in (model, Database.getDoneImages "")
 
 init : Int -> (Model, Cmd Msg)
 init index =
@@ -82,12 +92,9 @@ init index =
         Nothing -> Debug.crash "invalid image index..."
         Just image ->
           { imageIndex = index
-          , image = image
-          , chosen = Nothing
-          , exModel = Nothing
-          , board = List.repeat image.rows <| List.repeat image.cols Hidden
-          , uncoveredFields = image.rows * image.cols
+          , doneImages = []
           , fireworks = Nothing
+          , exercise = initExercise image
           }
   in
     (model, Cmd.none)
@@ -105,6 +112,26 @@ initImage imageId url width height rows cols =
     , cols = cols
     }
 
+initExercise : Image -> Exercise
+initExercise image =
+  { image = image
+  , chosen = Nothing
+  , exModel = Nothing
+  , board = List.repeat image.rows <| List.repeat image.cols Hidden
+  , uncoveredFields = image.rows * image.cols }
+
+changeExercise : Model -> Int -> (Model, Cmd Msg)
+changeExercise model index =
+  let img = itemAt images index
+      model_ = case img of
+        Nothing -> Debug.crash "invalid image index..."
+        Just image ->
+          { model
+          | imageIndex = index
+          , exercise = initExercise image }
+  in
+    (model_, Cmd.none)
+
 makeVisible : Board -> Maybe Coord -> Board
 makeVisible board maybeCoord =
   case maybeCoord of
@@ -121,10 +148,14 @@ makeVisible board maybeCoord =
             )
         )
 
+isImageDone : Model -> Image -> Bool
+isImageDone model img = List.any ((==) img.imageId) model.doneImages
+
 -----
 -- MESSAGES
 type Msg
   = NoOp
+  | DoneImages (List String)
   | ChooseImage Int
   | ChooseCell Coord
   | ExMsg Exercise.Msg
@@ -146,34 +177,43 @@ view model =
 viewImages : Model -> Html Msg
 viewImages model =
   let getContent i img = toString i
-      getThumbClass i =
-        if i == model.imageIndex
-          then class "thumbnail selected"
-          else class "thumbnail"
+      getSelectedClass i =
+        if i == model.imageIndex then "selected " else ""
+      getDoneClass img =
+        if isImageDone model img then "done " else ""
+
+      getThumbClass i img = class <| "thumbnail " ++ (getSelectedClass i) ++ (getDoneClass img)
   in
     div [ class "images" ] (
       images |> List.indexedMap (
-        \i img -> div [getThumbClass i, onClick (ChooseImage i)] [ text (getContent i img) ]
+        \i img -> div [getThumbClass i img, onClick (ChooseImage i)] [ text (getContent i img) ]
       )
     )
 
 viewImageUrl : Model -> Html Msg
-viewImageUrl model = div [] [ text model.image.url ]
+viewImageUrl model = div [] [ text model.exercise.image.url ]
 
 viewImageAndTable : Model -> Html Msg
 viewImageAndTable model =
   div [ class "image" ]
     [ viewImage model
-    , viewTable model
+    , viewTableIfNotDone model
     ]
 
 viewImage : Model -> Html Msg
 viewImage model =
   img
     [ class "image"
-    , src model.image.url
-    , width model.image.width
-    , height model.image.height ] []
+    , src model.exercise.image.url
+    , width model.exercise.image.width
+    , height model.exercise.image.height ] []
+
+viewTableIfNotDone : Model -> Html Msg
+viewTableIfNotDone model =
+  if isImageDone model model.exercise.image then
+    div [] []
+  else
+    viewTable model
 
 viewTable : Model -> Html Msg
 viewTable model =
@@ -187,19 +227,19 @@ viewTable model =
       Just (cr, cc) -> if (r == cr && c == cc) then "chosen" else ""
 
   in
-    table [width model.image.width, height model.image.height] <|
-      (flip List.indexedMap) model.board
+    table [width model.exercise.image.width, height model.exercise.image.height] <|
+      (flip List.indexedMap) model.exercise.board
         (\r row ->
           tr [] <|
             (flip List.indexedMap) row
               (\c cell ->
-                td [class (getClass cell), class (getChosenClass model.chosen r c), onClick (ChooseCell (r, c))] []
+                td [class (getClass cell), class (getChosenClass model.exercise.chosen r c), onClick (ChooseCell (r, c))] []
               )
         )
 
 viewExercise : Model -> Html Msg
 viewExercise model =
-  case model.exModel of
+  case model.exercise.exModel of
     Nothing -> text ""
     Just exModel ->
       let exHtml = Exercise.view exModel
@@ -232,25 +272,33 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     NoOp -> (model, Cmd.none)
+    DoneImages doneImages ->
+      (updateDoneImages model doneImages, Cmd.none)
     ChooseCell coord ->
       let
         domId = "exercise"
         (exModel, exCmd) = Exercise.init domId
+        exercise = model.exercise
         model_ = { model
-                | chosen = Just coord
-                , exModel = Just exModel }
+                 | exercise =
+                  { exercise
+                    | chosen = Just coord
+                    , exModel = Just exModel
+                  }
+                }
         cmdFocus = Task.attempt (always NoOp) (Dom.focus domId)
         cmdExCmd = Cmd.map ExMsg exCmd
       in
         (model_, Cmd.batch [cmdExCmd, cmdFocus])
     ExMsg exMsg ->
-      case model.exModel of
+      case model.exercise.exModel of
         Nothing -> (model, Cmd.none)
         Just exModel ->
           let
             (exModel_, exCmd) = Exercise.update exMsg exModel
-            model_ = { model
-                     | exModel = Just exModel_}
+            exercise = model.exercise
+            model_ = { model | exercise = { exercise
+                     | exModel = Just exModel_ } }
           in
             if Exercise.isCorrect exModel_ then
               (model, Cmd.none)
@@ -261,30 +309,36 @@ update msg model =
             else
               ( model_, Cmd.map ExMsg exCmd )
     ChooseImage index ->
-      init index
+      changeExercise model index
+      -- init index
+
+updateDoneImages : Model -> List String -> Model
+updateDoneImages model doneImages = { model | doneImages = doneImages }
 
 updateExerciseCorrect : Model -> (Model, Cmd Msg)
 updateExerciseCorrect model =
   let
-    model_ = { model
+    exercise = model.exercise
+    model_ = { model | exercise = { exercise
             | exModel = Nothing
             , chosen = Nothing
-            , board = makeVisible model.board model.chosen }
+            , board = makeVisible model.exercise.board model.exercise.chosen } }
   in
     (model_, Cmd.none)
 
 updateUncoveredFields : Model -> (Model, Cmd Msg)
 updateUncoveredFields model =
   let
-    model_ = { model
-             | uncoveredFields = model.uncoveredFields - 1 }
+    exercise = model.exercise
+    model_ = { model | exercise = { exercise
+             | uncoveredFields = model.exercise.uncoveredFields - 1 } }
   in
     (model_, Cmd.none)
 
 updateFireworks : Model -> (Model, Cmd Msg)
 updateFireworks model =
   let model_ =
-    if model.uncoveredFields == 0 then
+    if model.exercise.uncoveredFields == 0 then
       { model | fireworks = Just "fireworks1.gif" }
     else
       model
@@ -294,8 +348,8 @@ updateFireworks model =
 updateDoneImage : Model -> (Model, Cmd Msg)
 updateDoneImage model =
   let cmd_ =
-    if model.uncoveredFields == 0 then
-      Database.setImageDone model.image.imageId
+    if model.exercise.uncoveredFields == 0 then
+      Database.setImageDone model.exercise.image.imageId
     else
       Cmd.none
   in
@@ -305,7 +359,8 @@ updateDoneImage model =
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+      [ Database.doneImages DoneImages ]
 
 
 -----
@@ -332,7 +387,7 @@ andThen f (model, cmd) =
 main : Program Never Model Msg
 main =
     program
-        { init = init 0
+        { init = initGame
         , view = view
         , update = update
         , subscriptions = subscriptions
