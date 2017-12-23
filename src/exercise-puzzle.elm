@@ -5,24 +5,25 @@ import Html exposing (Html, div, text, program, node, img, table, tr, td)
 import Html.Attributes exposing (attribute, class, src, width, height)
 import Html.Events exposing (onClick)
 
-import Exercise
+import PuzzleExercise exposing (Puzzle)
+-- import Exercise
 import Database
 
 
 -----
 -- DATABASE
-images : List Image
+images : List PuzzleExercise.Image
 images =
-  [ initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
-  , initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
-  , initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
-  , initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
-  , initImage "shaun-candy-bus" "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
-  , initImage "reksio" "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
-  , initImage "cars-wasabi" "https://pbs.twimg.com/media/DNK_RxWX0AEjkBg.jpg" 1000 418 3 3
-  , initImage "spaceman-finn" "https://i1.wp.com/www.tor.com/wp-content/uploads/2016/01/calvin-hobbes-tfa-spaceman-finn.jpg?resize=625%2C625&type=vertical" 625 625 3 3
-  , initImage "poo-animgif" "https://quintype-01.imgix.net/thequint%2F2016-04%2Ff9b095be-760d-422a-8652-da8896835a79%2Ftumblr_lum55wl03h1qiol6o1.gif?q=35&auto=format&w=1200" 1200 511 4 6
-  , initImage "kylo_and_dart" "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/07/16/kylo-darth-calvin-hobbes.jpg" 1172 806 5 5
+  [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 1 1 -- 3 3
+  , PuzzleExercise.initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
+  , PuzzleExercise.initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
+  , PuzzleExercise.initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
+  , PuzzleExercise.initImage "shaun-candy-bus" "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
+  , PuzzleExercise.initImage "reksio" "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
+  , PuzzleExercise.initImage "cars-wasabi" "https://pbs.twimg.com/media/DNK_RxWX0AEjkBg.jpg" 1000 418 3 3
+  , PuzzleExercise.initImage "spaceman-finn" "https://i1.wp.com/www.tor.com/wp-content/uploads/2016/01/calvin-hobbes-tfa-spaceman-finn.jpg?resize=625%2C625&type=vertical" 625 625 3 3
+  , PuzzleExercise.initImage "poo-animgif" "https://quintype-01.imgix.net/thequint%2F2016-04%2Ff9b095be-760d-422a-8652-da8896835a79%2Ftumblr_lum55wl03h1qiol6o1.gif?q=35&auto=format&w=1200" 1200 511 4 6
+  , PuzzleExercise.initImage "kylo_and_dart" "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/07/16/kylo-darth-calvin-hobbes.jpg" 1172 806 5 5
   ]
 
   -- [ initImage "0" "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
@@ -51,30 +52,10 @@ images =
 
 -----
 -- MODELS
-type alias Coord = (Int, Int)
-type alias Board = List (List Cell)
-type Cell = Visible | Hidden
-type alias Image =
-  { imageId: String
-  , url: String
-  , width: Int
-  , height: Int
-  , rows: Int
-  , cols: Int
-  }
-
-type alias Exercise =
-  { image: Image
-  , chosen: Maybe Coord
-  , exModel: Maybe Exercise.Model
-  , board: Board
-  , uncoveredFields: Int
-  }
-
 type alias Model =
   { imageIndex: Int
   , doneImages: List String
-  , exercise: Exercise
+  , puzzle: Puzzle
   , fireworks: Maybe String
   }
 
@@ -94,61 +75,24 @@ init index =
           { imageIndex = index
           , doneImages = []
           , fireworks = Nothing
-          , exercise = initExercise image
+          , puzzle = PuzzleExercise.initPuzzle image False
           }
   in
     (model, Cmd.none)
 
-initImage : String -> String -> Int -> Int -> Int -> Int -> Image
-initImage imageId url width height rows cols =
-  let
-    localUrl = "resources/images/" ++ imageId
-  in
-    { imageId = imageId
-    , url = localUrl
-    , width = width
-    , height = height
-    , rows = rows
-    , cols = cols
-    }
-
-initExercise : Image -> Exercise
-initExercise image =
-  { image = image
-  , chosen = Nothing
-  , exModel = Nothing
-  , board = List.repeat image.rows <| List.repeat image.cols Hidden
-  , uncoveredFields = image.rows * image.cols }
-
-changeExercise : Model -> Int -> (Model, Cmd Msg)
-changeExercise model index =
+changePuzzle : Model -> Int -> (Model, Cmd Msg)
+changePuzzle model index =
   let img = itemAt images index
       model_ = case img of
         Nothing -> Debug.crash "invalid image index..."
         Just image ->
           { model
           | imageIndex = index
-          , exercise = initExercise image }
+          , puzzle = PuzzleExercise.initPuzzle image (isImageDone model image) }
   in
     (model_, Cmd.none)
 
-makeVisible : Board -> Maybe Coord -> Board
-makeVisible board maybeCoord =
-  case maybeCoord of
-    Nothing -> board
-    Just (r, c) ->
-      (flip List.indexedMap) board
-        (\br row ->
-          (flip List.indexedMap) row
-            (\bc cell ->
-              if (r == br && c == bc) then
-                Visible
-              else
-                cell
-            )
-        )
-
-isImageDone : Model -> Image -> Bool
+isImageDone : Model -> PuzzleExercise.Image -> Bool
 isImageDone model img = List.any ((==) img.imageId) model.doneImages
 
 -----
@@ -157,8 +101,7 @@ type Msg
   = NoOp
   | DoneImages (List String)
   | ChooseImage Int
-  | ChooseCell Coord
-  | ExMsg Exercise.Msg
+  | PuzzleMsg PuzzleExercise.Msg
 
 
 -----
@@ -169,8 +112,8 @@ view model =
     [ stylesheet
     -- , viewImageUrl model
     , viewImages model
-    , viewImageAndTable model
-    , viewExercise model
+    , PuzzleExercise.viewImageAndTable model.puzzle |> Html.map PuzzleMsg
+    , PuzzleExercise.viewExercise model.puzzle |> Html.map PuzzleMsg
     , viewFireworks model
     ]
 
@@ -191,59 +134,7 @@ viewImages model =
     )
 
 viewImageUrl : Model -> Html Msg
-viewImageUrl model = div [] [ text model.exercise.image.url ]
-
-viewImageAndTable : Model -> Html Msg
-viewImageAndTable model =
-  div [ class "image" ]
-    [ viewImage model
-    , viewTableIfNotDone model
-    ]
-
-viewImage : Model -> Html Msg
-viewImage model =
-  img
-    [ class "image"
-    , src model.exercise.image.url
-    , width model.exercise.image.width
-    , height model.exercise.image.height ] []
-
-viewTableIfNotDone : Model -> Html Msg
-viewTableIfNotDone model =
-  if isImageDone model model.exercise.image then
-    div [] []
-  else
-    viewTable model
-
-viewTable : Model -> Html Msg
-viewTable model =
-  let
-    getClass cell = case cell of
-      Visible -> "visible"
-      Hidden -> "hidden"
-
-    getChosenClass chosen r c = case chosen of
-      Nothing -> ""
-      Just (cr, cc) -> if (r == cr && c == cc) then "chosen" else ""
-
-  in
-    table [width model.exercise.image.width, height model.exercise.image.height] <|
-      (flip List.indexedMap) model.exercise.board
-        (\r row ->
-          tr [] <|
-            (flip List.indexedMap) row
-              (\c cell ->
-                td [class (getClass cell), class (getChosenClass model.exercise.chosen r c), onClick (ChooseCell (r, c))] []
-              )
-        )
-
-viewExercise : Model -> Html Msg
-viewExercise model =
-  case model.exercise.exModel of
-    Nothing -> text ""
-    Just exModel ->
-      let exHtml = Exercise.view exModel
-      in Html.map ExMsg exHtml
+viewImageUrl model = div [] [ text model.puzzle.image.url ]
 
 viewFireworks : Model -> Html Msg
 viewFireworks model =
@@ -274,71 +165,25 @@ update msg model =
     NoOp -> (model, Cmd.none)
     DoneImages doneImages ->
       (updateDoneImages model doneImages, Cmd.none)
-    ChooseCell coord ->
+    PuzzleMsg puzMsg ->
       let
-        domId = "exercise"
-        (exModel, exCmd) = Exercise.init domId
-        exercise = model.exercise
-        model_ = { model
-                 | exercise =
-                  { exercise
-                    | chosen = Just coord
-                    , exModel = Just exModel
-                  }
-                }
-        cmdFocus = Task.attempt (always NoOp) (Dom.focus domId)
-        cmdExCmd = Cmd.map ExMsg exCmd
+          puzModel = model.puzzle
+          (puzModel_, puzCmd_) = PuzzleExercise.update puzMsg model.puzzle
       in
-        (model_, Cmd.batch [cmdExCmd, cmdFocus])
-    ExMsg exMsg ->
-      case model.exercise.exModel of
-        Nothing -> (model, Cmd.none)
-        Just exModel ->
-          let
-            (exModel_, exCmd) = Exercise.update exMsg exModel
-            exercise = model.exercise
-            model_ = { model | exercise = { exercise
-                     | exModel = Just exModel_ } }
-          in
-            if Exercise.isCorrect exModel_ then
-              (model, Cmd.none)
-              |> andThen updateExerciseCorrect
-              |> andThen updateUncoveredFields
-              |> andThen updateFireworks
-              |> andThen updateDoneImage
-            else
-              ( model_, Cmd.map ExMsg exCmd )
+        ( {model | puzzle = puzModel_}
+        , Cmd.map PuzzleMsg puzCmd_
+        ) |> andThen updateFireworks
+          |> andThen updateDoneImage
     ChooseImage index ->
-      changeExercise model index
-      -- init index
+      changePuzzle model index
 
 updateDoneImages : Model -> List String -> Model
 updateDoneImages model doneImages = { model | doneImages = doneImages }
 
-updateExerciseCorrect : Model -> (Model, Cmd Msg)
-updateExerciseCorrect model =
-  let
-    exercise = model.exercise
-    model_ = { model | exercise = { exercise
-            | exModel = Nothing
-            , chosen = Nothing
-            , board = makeVisible model.exercise.board model.exercise.chosen } }
-  in
-    (model_, Cmd.none)
-
-updateUncoveredFields : Model -> (Model, Cmd Msg)
-updateUncoveredFields model =
-  let
-    exercise = model.exercise
-    model_ = { model | exercise = { exercise
-             | uncoveredFields = model.exercise.uncoveredFields - 1 } }
-  in
-    (model_, Cmd.none)
-
 updateFireworks : Model -> (Model, Cmd Msg)
 updateFireworks model =
   let model_ =
-    if model.exercise.uncoveredFields == 0 then
+    if PuzzleExercise.isDone model.puzzle then
       { model | fireworks = Just "fireworks1.gif" }
     else
       model
@@ -348,12 +193,13 @@ updateFireworks model =
 updateDoneImage : Model -> (Model, Cmd Msg)
 updateDoneImage model =
   let cmd_ =
-    if model.exercise.uncoveredFields == 0 then
-      Database.setImageDone model.exercise.image.imageId
+    if PuzzleExercise.isDone model.puzzle then
+      Database.setImageDone model.puzzle.image.imageId
     else
       Cmd.none
   in
     (model, cmd_)
+
 
 -----
 -- SUBSCRIPTIONS
