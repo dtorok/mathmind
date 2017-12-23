@@ -1,19 +1,19 @@
-module App exposing (..)
+module ExercisePuzzle exposing (..)
 import Task
 import Dom
 import Html exposing (Html, div, text, program, node, img, table, tr, td)
 import Html.Attributes exposing (attribute, class, src, width, height)
 import Html.Events exposing (onClick)
-import MD5 exposing (hex)
 
 import Exercise
+import Database
 
 
 -----
 -- DATABASE
 images : List Image
 images =
-  [ initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
+  [ initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 1 1 -- 3 3
   , initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
   , initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
   , initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
@@ -55,7 +55,8 @@ type alias Coord = (Int, Int)
 type alias Board = List (List Cell)
 type Cell = Visible | Hidden
 type alias Image =
-  { url: String
+  { imageId: String
+  , url: String
   , width: Int
   , height: Int
   , rows: Int
@@ -92,11 +93,12 @@ init index =
     (model, Cmd.none)
 
 initImage : String -> String -> Int -> Int -> Int -> Int -> Image
-initImage id url width height rows cols =
+initImage imageId url width height rows cols =
   let
-    localUrl = "resources/images/" ++ id
+    localUrl = "resources/images/" ++ imageId
   in
-    { url = localUrl
+    { imageId = imageId
+    , url = localUrl
     , width = width
     , height = height
     , rows = rows
@@ -255,6 +257,7 @@ update msg model =
               |> andThen updateExerciseCorrect
               |> andThen updateUncoveredFields
               |> andThen updateFireworks
+              |> andThen updateDoneImage
             else
               ( model_, Cmd.map ExMsg exCmd )
     ChooseImage index ->
@@ -287,6 +290,16 @@ updateFireworks model =
       model
   in
     (model_, Cmd.none)
+
+updateDoneImage : Model -> (Model, Cmd Msg)
+updateDoneImage model =
+  let cmd_ =
+    if model.uncoveredFields == 0 then
+      Database.setImageDone model.image.imageId
+    else
+      Cmd.none
+  in
+    (model, cmd_)
 
 -----
 -- SUBSCRIPTIONS

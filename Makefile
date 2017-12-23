@@ -1,8 +1,9 @@
 clean:
 	rm -rf dist
+	rm resources/exercise-puzzle.js
 
 build:
-	elm-make src/exercise-puzzle.elm
+	elm-make src/exercise-puzzle.elm --output resources/exercise-puzzle.js
 
 open: build
 	open index.html

@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="UTF-8"><title>Main</title><head>
+<body>
+<div id="spelling"></div>
+<script src="resources/exercise-puzzle.js"></script>
+<script>
+    var app = Elm.ExercisePuzzle.fullscreen();
+
+    app.ports.setImageDone.subscribe(function(imageId) {
+    	console.log(imageId);
+      // app.ports.suggestions.send(suggestions);
+    });
+
+    app.ports.getDoneImages.subscribe(function() {
+      doneImages(["calvin"])
+    });
+
+    function doneImages(doneImages) {
+      app.ports.doneImages.send(doneImages);
+    }
+
+</script>
+</body>
+</html>
