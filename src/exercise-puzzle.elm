@@ -14,7 +14,7 @@ import Database
 -- DATABASE
 images : List PuzzleExercise.Image
 images =
-  [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 1 1 -- 3 3
+  [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
   , PuzzleExercise.initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
   , PuzzleExercise.initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
   , PuzzleExercise.initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
@@ -62,7 +62,7 @@ type alias Model =
 initGame : (Model, Cmd Msg)
 initGame =
   let (model, cmd) = init 0
-  in (model, Database.getDoneImages "")
+  in (model, Database.dbGetDoneImages)
 
 init : Int -> (Model, Cmd Msg)
 init index =
@@ -164,7 +164,7 @@ update msg model =
   case msg of
     NoOp -> (model, Cmd.none)
     DoneImages doneImages ->
-      (updateDoneImages model doneImages, Cmd.none)
+      (updateDoneImages model doneImages |> updateCurrentDone, Cmd.none)
     PuzzleMsg puzMsg ->
       let
           puzModel = model.puzzle
@@ -180,6 +180,21 @@ update msg model =
 updateDoneImages : Model -> List String -> Model
 updateDoneImages model doneImages = { model | doneImages = doneImages }
 
+updateCurrentDone : Model -> Model
+updateCurrentDone model =
+  let
+    currentFromDoneImages =
+      List.filter
+        (\imgId -> imgId == model.puzzle.image.imageId)
+        model.doneImages
+    isCurrentDone = (List.length currentFromDoneImages) > 0
+    puzzle = model.puzzle
+  in
+    if isCurrentDone then
+      {model | puzzle = {puzzle | isDone = True}}
+    else
+      model
+
 updateFireworks : Model -> (Model, Cmd Msg)
 updateFireworks model =
   let model_ =
@@ -192,11 +207,13 @@ updateFireworks model =
 
 updateDoneImage : Model -> (Model, Cmd Msg)
 updateDoneImage model =
-  let cmd_ =
-    if PuzzleExercise.isDone model.puzzle then
-      Database.setImageDone model.puzzle.image.imageId
-    else
-      Cmd.none
+  let
+    img = model.puzzle.image
+    cmd_ =
+      if PuzzleExercise.isDone model.puzzle then
+        Database.dbSetImageDone img.imageId (img.cols * img.rows)
+      else
+        Cmd.none
   in
     (model, cmd_)
 
@@ -206,7 +223,7 @@ updateDoneImage model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-      [ Database.doneImages DoneImages ]
+      [ Database.dbDoneImages DoneImages ]
 
 
 -----

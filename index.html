@@ -2,22 +2,55 @@
 <html><head><meta charset="UTF-8"><title>Main</title><head>
 <body>
 <div id="spelling"></div>
+
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: API_KEY,
+    authDomain: "mathmind-58910.firebaseapp.com",
+    databaseURL: "https://mathmind-58910.firebaseio.com",
+    projectId: "mathmind-58910",
+    storageBucket: "mathmind-58910.appspot.com",
+    messagingSenderId: "132308405522"
+  };
+  firebase.initializeApp(config);
+
+  var database = firebase.database();
+  var keyBase = "mathmind/images-done/"
+</script>
+
 <script src="resources/exercise-puzzle.js"></script>
 <script>
     var app = Elm.ExercisePuzzle.fullscreen();
 
-    app.ports.setImageDone.subscribe(function(imageId) {
-    	console.log(imageId);
-      // app.ports.suggestions.send(suggestions);
+    app.ports.setImageDone.subscribe(function(msg) {
+      var parts = msg.split("/:/")
+      var imageId = parts[0];
+      var score = Number.parseInt(parts[1]);
+
+      database.ref(keyBase + imageId).set({
+        done: true,
+        score: score
+      }).then(getDoneImages);
     });
 
     app.ports.getDoneImages.subscribe(function() {
-      doneImages(["calvin"])
+      getDoneImages()
     });
 
-    function doneImages(doneImages) {
-      console.log("iamges are done: " + doneImages)
-      app.ports.doneImages.send(doneImages);
+    function getDoneImages() {
+      database.ref(keyBase).once('value', function(data) {
+        var doneImages = [];
+        data.forEach(function(item) {
+          doneImages.push(item.key)
+        })
+
+        console.log("iamges are done: " + doneImages)
+        app.ports.doneImages.send(doneImages);
+      });
+
     }
 
 </script>
