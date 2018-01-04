@@ -8,9 +8,10 @@ build:
 open: build
 	open index.html
 
-dist: build download clean
+dist: clean download build
 	mkdir dist
 	cp index.html dist/
+	cp config.js dist/
 	cp -r resources dist/
 
 deploy: dist

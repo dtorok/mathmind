@@ -1,4 +1,6 @@
 elm-stuff/
+dist/
+.devel/
 resources/exercise-puzzle.js
 config.js
 

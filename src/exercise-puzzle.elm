@@ -14,17 +14,27 @@ import Database
 -- DATABASE
 images : List PuzzleExercise.Image
 images =
-  [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
-  , PuzzleExercise.initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
-  , PuzzleExercise.initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
-  , PuzzleExercise.initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
-  , PuzzleExercise.initImage "shaun-candy-bus" "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
-  , PuzzleExercise.initImage "reksio" "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
-  , PuzzleExercise.initImage "cars-wasabi" "https://pbs.twimg.com/media/DNK_RxWX0AEjkBg.jpg" 1000 418 3 3
-  , PuzzleExercise.initImage "spaceman-finn" "https://i1.wp.com/www.tor.com/wp-content/uploads/2016/01/calvin-hobbes-tfa-spaceman-finn.jpg?resize=625%2C625&type=vertical" 625 625 3 3
-  , PuzzleExercise.initImage "poo-animgif" "https://quintype-01.imgix.net/thequint%2F2016-04%2Ff9b095be-760d-422a-8652-da8896835a79%2Ftumblr_lum55wl03h1qiol6o1.gif?q=35&auto=format&w=1200" 1200 511 4 6
-  , PuzzleExercise.initImage "kylo_and_dart" "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/07/16/kylo-darth-calvin-hobbes.jpg" 1172 806 5 5
+  [ PuzzleExercise.initImage "bb8" "https://orig00.deviantart.net/8a1a/f/2015/195/f/0/bb8_animated_gif_by_blue_staple_studios-d9197jh.gif" 960 540 10 1
+  , PuzzleExercise.initImage "po-shifu" "https://i.pinimg.com/736x/97/11/94/9711942852d1a2316bcde5eda2a677ea--kung-fu-panda-room-art.jpg" 720 720 4 5
+  , PuzzleExercise.initImage "bock-bock-bocka" "https://78.media.tumblr.com/59a203738ce4107dc2aeb348d829d289/tumblr_inline_nxgvsrXsGu1salyiw_500.gif" 1000 562 4 4
+  , PuzzleExercise.initImage "mario-rabbids" "https://static.gamespot.com/uploads/scale_super/1552/15524586/3279789-mario-rabbids.jpg" 1000 562 4 6
+  , PuzzleExercise.initImage "po-hit" "https://i.giphy.com/media/YxskfjnmTluKs/giphy.webp" 1000 402 4 6
+  , PuzzleExercise.initImage "spider-sinister6" "https://img00.deviantart.net/3d0b/i/2017/128/f/5/spider_man_chase_by_patrickbrown-db8isc2.jpg" 1280 884 6 6
+  , PuzzleExercise.initImage "vulture-vs-spider" "https://img00.deviantart.net/dfb3/i/2015/217/a/8/vulture_vs_spider_man_by_spidermanfan2099-d94cd35.jpg" 1024 641 5 6
+  , PuzzleExercise.initImage "po-teaches" "https://i.giphy.com/media/CDZs1J3ioQ78k/giphy.webp" 1280 720 4 9
   ]
+
+  -- [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
+  -- , PuzzleExercise.initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
+  -- , PuzzleExercise.initImage "poo-before-fight" "https://vignette3.wikia.nocookie.net/kungfupanda/images/0/0a/PoAdversary.jpg/revision/latest" 1920 816 3 6
+  -- , PuzzleExercise.initImage "cars-crowd" "https://wallpapercave.com/wp/k6XGIO9.jpg" 1024 768 5 5
+  -- , PuzzleExercise.initImage "shaun-candy-bus" "https://i.ytimg.com/vi/WBXEE2StIwY/maxresdefault.jpg" 1280 720 3 4
+  -- , PuzzleExercise.initImage "reksio" "http://bi.gazeta.pl/im/30/b3/bd/z12432176IER,Reksio.jpg" 1280 864 3 3
+  -- , PuzzleExercise.initImage "cars-wasabi" "https://pbs.twimg.com/media/DNK_RxWX0AEjkBg.jpg" 1000 418 3 3
+  -- , PuzzleExercise.initImage "spaceman-finn" "https://i1.wp.com/www.tor.com/wp-content/uploads/2016/01/calvin-hobbes-tfa-spaceman-finn.jpg?resize=625%2C625&type=vertical" 625 625 3 3
+  -- , PuzzleExercise.initImage "poo-animgif" "https://quintype-01.imgix.net/thequint%2F2016-04%2Ff9b095be-760d-422a-8652-da8896835a79%2Ftumblr_lum55wl03h1qiol6o1.gif?q=35&auto=format&w=1200" 1200 511 4 6
+  -- , PuzzleExercise.initImage "kylo_and_dart" "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/07/16/kylo-darth-calvin-hobbes.jpg" 1172 806 5 5
+  -- ]
 
   -- [ initImage "0" "http://cdn.cheatcc.com/Screenshots/guide/title_card.jpg" 1280 720 4 4
   -- , initImage "1" "https://i.ytimg.com/vi/IdptgB2a7xA/maxresdefault.jpg" 1280 720 4 6
@@ -88,6 +98,7 @@ changePuzzle model index =
         Just image ->
           { model
           | imageIndex = index
+          , fireworks = Nothing
           , puzzle = PuzzleExercise.initPuzzle image (isImageDone model image) }
   in
     (model_, Cmd.none)
@@ -199,7 +210,7 @@ updateFireworks : Model -> (Model, Cmd Msg)
 updateFireworks model =
   let model_ =
     if PuzzleExercise.isDone model.puzzle then
-      { model | fireworks = Just "fireworks1.gif" }
+      { model | fireworks = Just "fireworks2.gif" }
     else
       model
   in
@@ -209,9 +220,10 @@ updateDoneImage : Model -> (Model, Cmd Msg)
 updateDoneImage model =
   let
     img = model.puzzle.image
+    score = img.cols * img.rows
     cmd_ =
-      if PuzzleExercise.isDone model.puzzle then
-        Database.dbSetImageDone img.imageId (img.cols * img.rows)
+      if PuzzleExercise.isDone model.puzzle && score > 1 then
+        Database.dbSetImageDone img.imageId score
       else
         Cmd.none
   in
