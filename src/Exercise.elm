@@ -119,7 +119,7 @@ update msg model =
           if correct then Correct
           else Wrong
         cmd =
-          if correct then Database.dbExerciseSolved (exerciseType2str model.exerciseType)
+          if correct then Database.dbAddScore (exerciseType2str model.exerciseType)
           else Cmd.none
       in
         ( { model | evaluation = evaluation }, cmd )

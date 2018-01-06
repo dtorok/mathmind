@@ -20,43 +20,32 @@
   var database = firebase.database();
   var keyBase = "mathmind/"
   var KeyBaseImagesDone = keyBase + "images-done/"
-  var keyBaseExercisesSolved = keyBase + "exercises-solved/"
+  var keyBaseScores = keyBase + "scores/"
 </script>
 
 <script src="resources/exercise-puzzle.js"></script>
 <script>
     var app = Elm.ExercisePuzzle.fullscreen();
+    var DELIMITER = "/:/";
 
+    /////
+    // DONE IMAGES
     app.ports.setImageDone.subscribe(function(msg) {
-      var parts = msg.split("/:/")
+      var parts = msg.split(DELIMITER)
       var imageId = parts[0];
       var score = Number.parseInt(parts[1]);
 
       database.ref(KeyBaseImagesDone + imageId).set({
         done: true,
         score: score
-      }).then(getDoneImages);
-    });
-
-    app.ports.exerciseSolved.subscribe(function(msg) {
-      var exerciseType = msg;
-      var key = keyBaseExercisesSolved + msg + "/";
-      console.log("exerciseSolved: " + exerciseType);
-      database
-        .ref(key)
-        .once('value', function(data) {
-          var val = data.val();
-          console.log("currentScore for " + exerciseType + ": " + val);
-          database.ref(key).set(val + 1)
-        })
-        .then(showScore)
+      }).then(updateDoneImages);
     });
 
     app.ports.getDoneImages.subscribe(function() {
-      getDoneImages()
+      updateDoneImages()
     });
 
-    function getDoneImages() {
+    function updateDoneImages() {
       database.ref(KeyBaseImagesDone).once('value', function(data) {
         var doneImages = [];
         data.forEach(function(item) {
@@ -64,12 +53,42 @@
         })
 
         console.log("images are done: " + doneImages)
-        app.ports.doneImages.send(doneImages);
+        app.ports.updateDoneImages.send(doneImages);
       });
     }
 
-    function showScore() {
-      console.log("show score")
+    /////
+    // SCORES
+    app.ports.addScore.subscribe(function(msg) {
+      var exerciseType = msg;
+      var key = keyBaseScores + msg + "/";
+      database
+        .ref(key)
+        .once('value', function(data) {
+          var val = data.val();
+          database.ref(key).set(val + 1)
+        })
+        .then(updateScores)
+    });
+
+    app.ports.getScores.subscribe(function(msg) {
+      updateScores();
+    });
+
+    function updateScores() {
+      database.ref(keyBaseScores).once('value', function(data) {
+        var scores = [];
+
+        data.forEach(function(item) {
+          var type = item.key;
+          var val = item.val();
+
+          scores.push(type + DELIMITER + val)
+        });
+
+        console.log("currentScore: " + scores);
+        app.ports.updateScores.send(scores)
+      });
     }
 
 </script>

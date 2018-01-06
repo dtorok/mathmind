@@ -67,12 +67,14 @@ type alias Model =
   , doneImages: List String
   , puzzle: Puzzle
   , fireworks: Maybe String
+  , scores: List (String, Int)
   }
 
 initGame : (Model, Cmd Msg)
 initGame =
   let (model, cmd) = init 0
-  in (model, Database.dbGetDoneImages)
+  in (model, Cmd.batch [ Database.dbGetDoneImages
+                       , Database.dbGetScores ] )
 
 init : Int -> (Model, Cmd Msg)
 init index =
@@ -86,6 +88,7 @@ init index =
           , doneImages = []
           , fireworks = Nothing
           , puzzle = PuzzleExercise.initPuzzle image False
+          , scores = []
           }
   in
     (model, Cmd.none)
@@ -111,7 +114,7 @@ isImageDone model img = List.any ((==) img.imageId) model.doneImages
 type Msg
   = NoOp
   | DoneImages (List String)
-  | SumScore Int
+  | UpdateScores (List (String, Int))
   | ChooseImage Int
   | PuzzleMsg PuzzleExercise.Msg
 
@@ -124,6 +127,7 @@ view model =
     [ stylesheet
     -- , viewImageUrl model
     , viewImages model
+    , viewScores model
     , PuzzleExercise.viewImageAndTable model.puzzle |> Html.map PuzzleMsg
     , PuzzleExercise.viewExercise model.puzzle |> Html.map PuzzleMsg
     , viewFireworks model
@@ -144,6 +148,14 @@ viewImages model =
         \i img -> div [getThumbClass i img, onClick (ChooseImage i)] [ text (getContent i img) ]
       )
     )
+
+viewScores : Model -> Html Msg
+viewScores model =
+  let fullScore = model.scores
+    |> List.map Tuple.second
+    |> List.sum
+  in
+    div [] [ text <| "Scores: " ++ (toString fullScore)]
 
 viewImageUrl : Model -> Html Msg
 viewImageUrl model = div [] [ text model.puzzle.image.url ]
@@ -186,7 +198,10 @@ update msg model =
         , Cmd.map PuzzleMsg puzCmd_
         ) |> andThen updateFireworks
           |> andThen updateDoneImage
-    SumScore score -> (model, Cmd.none)
+    UpdateScores scores ->
+      ( {model | scores = scores }
+      , Cmd.none
+      )
     ChooseImage index ->
       changePuzzle model index
 
@@ -237,7 +252,8 @@ updateDoneImage model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-      [ Database.dbDoneImages DoneImages ]
+      [ Database.dbUpdateDoneImages DoneImages
+      , Database.dbUpdateScores UpdateScores]
 
 
 -----
