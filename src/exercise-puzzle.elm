@@ -111,6 +111,7 @@ isImageDone model img = List.any ((==) img.imageId) model.doneImages
 type Msg
   = NoOp
   | DoneImages (List String)
+  | SumScore Int
   | ChooseImage Int
   | PuzzleMsg PuzzleExercise.Msg
 
@@ -185,6 +186,7 @@ update msg model =
         , Cmd.map PuzzleMsg puzCmd_
         ) |> andThen updateFireworks
           |> andThen updateDoneImage
+    SumScore score -> (model, Cmd.none)
     ChooseImage index ->
       changePuzzle model index
 

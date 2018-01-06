@@ -162,13 +162,14 @@ update msg model =
           let
             (exModel_, exCmd) = Exercise.update exMsg exModel
             model_ = { model | exModel = Just exModel_ }
+            cmd_ = Cmd.map ExMsg exCmd
           in
             if Exercise.isCorrect exModel_ then
-              (model, Cmd.none)
+              (model, cmd_)
               |> andThen updateExerciseCorrect
               |> andThen updateUncoveredFields
             else
-              ( model_, Cmd.map ExMsg exCmd )
+              ( model_, cmd_ )
 
 updateExerciseCorrect : Puzzle -> (Puzzle, Cmd Msg)
 updateExerciseCorrect model =

@@ -18,7 +18,9 @@
   firebase.initializeApp(config);
 
   var database = firebase.database();
-  var keyBase = "mathmind/images-done/"
+  var keyBase = "mathmind/"
+  var KeyBaseImagesDone = keyBase + "images-done/"
+  var keyBaseExercisesSolved = keyBase + "exercises-solved/"
 </script>
 
 <script src="resources/exercise-puzzle.js"></script>
@@ -30,10 +32,24 @@
       var imageId = parts[0];
       var score = Number.parseInt(parts[1]);
 
-      database.ref(keyBase + imageId).set({
+      database.ref(KeyBaseImagesDone + imageId).set({
         done: true,
         score: score
       }).then(getDoneImages);
+    });
+
+    app.ports.exerciseSolved.subscribe(function(msg) {
+      var exerciseType = msg;
+      var key = keyBaseExercisesSolved + msg + "/";
+      console.log("exerciseSolved: " + exerciseType);
+      database
+        .ref(key)
+        .once('value', function(data) {
+          var val = data.val();
+          console.log("currentScore for " + exerciseType + ": " + val);
+          database.ref(key).set(val + 1)
+        })
+        .then(showScore)
     });
 
     app.ports.getDoneImages.subscribe(function() {
@@ -41,16 +57,19 @@
     });
 
     function getDoneImages() {
-      database.ref(keyBase).once('value', function(data) {
+      database.ref(KeyBaseImagesDone).once('value', function(data) {
         var doneImages = [];
         data.forEach(function(item) {
           doneImages.push(item.key)
         })
 
-        console.log("iamges are done: " + doneImages)
+        console.log("images are done: " + doneImages)
         app.ports.doneImages.send(doneImages);
       });
+    }
 
+    function showScore() {
+      console.log("show score")
     }
 
 </script>

@@ -6,6 +6,8 @@ import Html exposing (Html, div, input, text, form)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onInput, onSubmit)
 
+import Database
+
 
 -----
 -- MODEL
@@ -22,6 +24,7 @@ exerciseTypes =
 
 type alias Model =
   { id: String
+  , exerciseType: ExerciseType
   , num1: Int
   , num2: Int
   , result: Int
@@ -30,9 +33,18 @@ type alias Model =
   , evaluation: Evaluation
 }
 
-createModel : String -> Int -> Operator -> Int -> Model
-createModel id num1 op num2 =
+
+-----
+-- MESSAGES
+type Msg = Noop | InitModel Model | Input String | Submit
+
+
+-----
+-- MODEL CREATION
+createModel : String -> ExerciseType -> Int -> Operator -> Int -> Model
+createModel id t num1 op num2 =
   { id = id
+  , exerciseType = t
   , num1 = num1
   , num2 = num2
   , result = execute num1 op num2
@@ -43,21 +55,31 @@ createModel id num1 op num2 =
 
 -----
 -- INIT
-initWithData : String -> Int -> Operator -> Int -> (Model, Cmd Msg)
-initWithData id num1 op num2 =
-  (createModel id num1 op num2, Cmd.none)
+initWithData : String -> ExerciseType -> Int -> Operator -> Int -> (Model, Cmd Msg)
+initWithData id t num1 op num2 =
+  (createModel id t num1 op num2, Cmd.none)
 
 init : String -> (Model, Cmd Msg)
 init id =
   let
-    model = createModel id 0 Add 0
-    gen = Random.generate (Init id)
+    model = createModel id Addition 0 Add 0
+    gen = Random.generate InitModel
       (  int 0 ((List.length exerciseTypes) - 1)
       |> map index2type
-      |> andThen generateByType
+      |> andThen (generateModelByType id)
       )
   in
     ( model, gen )
+
+generateModelByType : String -> ExerciseType -> Generator Model
+generateModelByType id t =
+  let
+    genData = generateByType t
+    data2model : (Int, Operator, Int) -> Model
+    data2model (n1, op, n2) =
+      createModel id t n1 op n2
+  in
+    Random.map data2model genData
 
 generateByType : ExerciseType -> Generator (Int, Operator, Int)
 generateByType t =
@@ -74,11 +96,6 @@ generateByType t =
 
 
 -----
--- MESSAGES
-type Msg = Noop | Init String (Int, Operator, Int) | Input String | Submit
-
-
------
 -- API
 isCorrect : Model -> Bool
 isCorrect model = model.evaluation == Correct
@@ -91,20 +108,21 @@ update msg model =
   case msg of
     Noop ->
       (model, Cmd.none)
-    Init id (n1, op, n2) ->
-      let model = createModel id n1 op n2
-      in (model, Cmd.none)
+    InitModel model ->
+      (model, Cmd.none)
     Input value ->
       ( { model | input = value }, Cmd.none)
     Submit ->
       let
+        correct = model.input == (toString model.result)
         evaluation =
-          if model.input == (toString model.result) then
-            Correct
-          else
-            Wrong
+          if correct then Correct
+          else Wrong
+        cmd =
+          if correct then Database.dbExerciseSolved (exerciseType2str model.exerciseType)
+          else Cmd.none
       in
-        ( { model | evaluation = evaluation }, Cmd.none )
+        ( { model | evaluation = evaluation }, cmd )
 
 
 -----
@@ -140,6 +158,12 @@ op2str op =
   case op of
     Add -> "+"
     Sub -> "-"
+
+exerciseType2str : ExerciseType -> String
+exerciseType2str t =
+  case t of
+    Addition -> "addition"
+    Subtraction -> "subtraction"
 
 type2op : ExerciseType -> Operator
 type2op t =
