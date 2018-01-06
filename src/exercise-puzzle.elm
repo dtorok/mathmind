@@ -128,9 +128,11 @@ view model =
     -- , viewImageUrl model
     , viewImages model
     , viewScores model
-    , PuzzleExercise.viewImageAndTable model.puzzle |> Html.map PuzzleMsg
-    , PuzzleExercise.viewExercise model.puzzle |> Html.map PuzzleMsg
-    , viewFireworks model
+    , div [class "puzzleImage"]
+      [ PuzzleExercise.viewImageAndTable model.puzzle |> Html.map PuzzleMsg
+      , PuzzleExercise.viewExercise model.puzzle |> Html.map PuzzleMsg
+      , viewFireworks model
+      ]
     ]
 
 viewImages : Model -> Html Msg
