@@ -6,6 +6,18 @@
 <script src="config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
 <script>
+
+  function promptProfile() {
+    var profiles = ["jonas", "gazsi", "apa"]
+    var profile = null;
+
+    while (profiles.indexOf(profile) == -1) {
+      profile = prompt("Who are you? jonas or gazsi?")
+    }
+
+    return profile;
+  }
+
   // Initialize Firebase
   var config = {
     apiKey: API_KEY,
@@ -18,7 +30,7 @@
   firebase.initializeApp(config);
 
   var database = firebase.database();
-  var profile = "jonas";
+  var profile = promptProfile();
 
   var keyBase = "mathmind/profiles/" + profile + "/";
   var KeyBaseImagesDone = keyBase + "images-done/"
