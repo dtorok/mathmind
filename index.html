@@ -9,7 +9,7 @@
 
   function promptProfile() {
     var profiles = ["jonas", "gazsi", "apa"]
-    var profile = null;
+    var profile = document.location.hash.substr(1);
 
     while (profiles.indexOf(profile) == -1) {
       profile = prompt("Who are you? jonas or gazsi?")
