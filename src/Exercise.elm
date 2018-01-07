@@ -13,7 +13,8 @@ import Database
 -- MODEL
 type Operator = Add | Sub
 type Evaluation = None | Correct | Wrong
-type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction
+type Component = Num1 | Num2 | Result
+type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction | AdditionTo10
 
 
 exerciseTypes : List ExerciseType
@@ -22,6 +23,7 @@ exerciseTypes =
   , Subtraction
   , DoubleAddition
   , DoubleSubtraction
+  , AdditionTo10
   ]
 
 type alias Model =
@@ -32,6 +34,7 @@ type alias Model =
   , result: Int
   , op: Operator
   , input : String
+  , blank : Component
   , evaluation: Evaluation
 }
 
@@ -43,8 +46,8 @@ type Msg = Noop | InitModel Model | Input String | Submit
 
 -----
 -- MODEL CREATION
-createModel : String -> ExerciseType -> Int -> Operator -> Int -> Model
-createModel id t num1 op num2 =
+createModel : String -> ExerciseType -> Int -> Operator -> Int -> Component -> Model
+createModel id t num1 op num2 blank =
   { id = id
   , exerciseType = t
   , num1 = num1
@@ -52,22 +55,23 @@ createModel id t num1 op num2 =
   , result = execute num1 op num2
   , op = op
   , input = ""
+  , blank = blank
   , evaluation = None }
 
 
 -----
 -- INIT
-initWithData : String -> ExerciseType -> Int -> Operator -> Int -> (Model, Cmd Msg)
-initWithData id t num1 op num2 =
-  (createModel id t num1 op num2, Cmd.none)
+initWithData : String -> ExerciseType -> Int -> Operator -> Int -> Component -> (Model, Cmd Msg)
+initWithData id t num1 op num2 blank =
+  (createModel id t num1 op num2 blank, Cmd.none)
 
 init : String -> (Model, Cmd Msg)
 init id =
   let
-    model = createModel id Addition 0 Add 0
+    model = createModel id Addition 0 Add 0 Result
     gen = Random.generate InitModel (
       int 0 ((List.length exerciseTypes) - 1)
-      -- int 3 3
+      -- int 4 4
       |> map index2type
       |> andThen (generateModelByType id)
       )
@@ -78,9 +82,10 @@ generateModelByType : String -> ExerciseType -> Generator Model
 generateModelByType id t =
   let
     genData = generateByType t
+    blank = type2blank t
     data2model : (Int, Operator, Int) -> Model
     data2model (n1, op, n2) =
-      createModel id t n1 op n2
+      createModel id t n1 op n2 blank
   in
     Random.map data2model genData
 
@@ -104,6 +109,11 @@ generateByType t =
       (int 3 10)
         |> map (\a -> (a * 2, a))
         |> map result
+    AdditionTo10 ->
+      (int 1 9)
+        |> map (\a -> (a, 10 - a))
+        |> map result
+
 
 
 -----
@@ -125,7 +135,7 @@ update msg model =
       ( { model | input = value }, Cmd.none)
     Submit ->
       let
-        correct = model.input == (toString model.result)
+        correct = model.input == toString (component2value model model.blank)
         evaluation =
           if correct then Correct
           else Wrong
@@ -142,15 +152,29 @@ view : Model -> Html Msg
 view model =
   div [ class "exercise" ]
     [ form [onSubmit Submit]
-      [
-        viewExercise model
-      , input [ onInput Input, id model.id ] []
+      [ viewComponent model Num1
+      , viewOperator model
+      , viewComponent model Num2
+      , text " = "
+      , viewComponent model Result
       , viewEvaluation model
       ]
     ]
 
-viewExercise : Model -> Html msg
-viewExercise model = text <| (toString model.num1) ++ " " ++ (op2str model.op) ++ " " ++ (toString model.num2) ++ " = "
+viewComponent : Model -> Component -> Html Msg
+viewComponent model component =
+  let
+    value = component2value model component
+    isBlank = component == model.blank
+  in
+    if isBlank then
+      input [ onInput Input, id model.id ] []
+    else
+      text (toString value)
+
+viewOperator : Model -> Html Msg
+viewOperator model =
+  text (" " ++ (op2str model.op) ++ " ")
 
 viewEvaluation : Model -> Html msg
 viewEvaluation model =
@@ -177,6 +201,7 @@ exerciseType2str t =
     Subtraction -> "subtraction"
     DoubleAddition -> "double_addition"
     DoubleSubtraction -> "double_subtraction"
+    AdditionTo10 -> "addition_to_10"
 
 type2op : ExerciseType -> Operator
 type2op t =
@@ -185,6 +210,23 @@ type2op t =
     Subtraction -> Sub
     DoubleAddition -> Add
     DoubleSubtraction -> Sub
+    AdditionTo10 -> Add
+
+type2blank : ExerciseType -> Component
+type2blank t =
+  case t of
+    Addition -> Result
+    Subtraction -> Result
+    DoubleAddition -> Result
+    DoubleSubtraction -> Result
+    AdditionTo10 -> Num2
+
+component2value : Model -> Component -> Int
+component2value model component =
+  case component of
+    Num1 -> model.num1
+    Num2 -> model.num2
+    Result -> model.result
 
 orderTuple : (Int, Int) -> (Int, Int)
 orderTuple (a, b) = (max a b, min a b)
