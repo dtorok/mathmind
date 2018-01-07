@@ -13,13 +13,15 @@ import Database
 -- MODEL
 type Operator = Add | Sub
 type Evaluation = None | Correct | Wrong
-type ExerciseType = Addition | Subtraction
+type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction
 
 
 exerciseTypes : List ExerciseType
 exerciseTypes =
   [ Addition
   , Subtraction
+  , DoubleAddition
+  , DoubleSubtraction
   ]
 
 type alias Model =
@@ -63,8 +65,9 @@ init : String -> (Model, Cmd Msg)
 init id =
   let
     model = createModel id Addition 0 Add 0
-    gen = Random.generate InitModel
-      (  int 0 ((List.length exerciseTypes) - 1)
+    gen = Random.generate InitModel (
+      int 0 ((List.length exerciseTypes) - 1)
+      -- int 3 3
       |> map index2type
       |> andThen (generateModelByType id)
       )
@@ -92,6 +95,14 @@ generateByType t =
     Subtraction ->
       pair (int 2 9) (int 2 9)
         |> map (\(a, b) -> (a + b, b))
+        |> map result
+    DoubleAddition ->
+      (int 3 10)
+        |> map (\a -> (a, a))
+        |> map result
+    DoubleSubtraction ->
+      (int 3 10)
+        |> map (\a -> (a * 2, a))
         |> map result
 
 
@@ -164,12 +175,16 @@ exerciseType2str t =
   case t of
     Addition -> "addition"
     Subtraction -> "subtraction"
+    DoubleAddition -> "double_addition"
+    DoubleSubtraction -> "double_subtraction"
 
 type2op : ExerciseType -> Operator
 type2op t =
   case t of
     Addition -> Add
     Subtraction -> Sub
+    DoubleAddition -> Add
+    DoubleSubtraction -> Sub
 
 orderTuple : (Int, Int) -> (Int, Int)
 orderTuple (a, b) = (max a b, min a b)
