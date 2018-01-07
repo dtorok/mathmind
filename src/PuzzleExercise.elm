@@ -146,7 +146,10 @@ update msg model =
     ChooseCell coord ->
       let
         domId = "exercise"
-        (exModel, exCmd) = Exercise.init domId
+        (exModel, exCmd) =
+          case model.exModel of
+            Just m -> (m, Cmd.none)
+            Nothing -> Exercise.init domId
         model_ = { model
                   | chosen = Just coord
                   , exModel = Just exModel
