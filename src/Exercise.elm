@@ -14,7 +14,7 @@ import Database
 type Operator = Add | Sub
 type Evaluation = None | Correct | Wrong
 type Component = Num1 | Num2 | Result
-type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction | AdditionTo10
+type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction | AdditionTo10 | SubtractionFrom10
 
 
 exerciseTypes : List ExerciseType
@@ -22,8 +22,15 @@ exerciseTypes =
   [ Addition
   , Subtraction
   , DoubleAddition
+  , DoubleAddition
+  , DoubleSubtraction
   , DoubleSubtraction
   , AdditionTo10
+  , AdditionTo10
+  , AdditionTo10
+  , SubtractionFrom10
+  , SubtractionFrom10
+  , SubtractionFrom10
   ]
 
 type alias Model =
@@ -66,17 +73,21 @@ initWithData id t num1 op num2 blank =
   (createModel id t num1 op num2 blank, Cmd.none)
 
 init : String -> (Model, Cmd Msg)
-init id =
+init id = initWithTypeOptions id exerciseTypes
+
+initWithTypeOptions : String -> List ExerciseType -> (Model, Cmd Msg)
+initWithTypeOptions id typeOptions =
   let
     model = createModel id Addition 0 Add 0 Result
     gen = Random.generate InitModel (
-      int 0 ((List.length exerciseTypes) - 1)
-      -- int 4 4
+      int 0 ((List.length typeOptions) - 1)
+      -- int 5 5
       |> map index2type
       |> andThen (generateModelByType id)
       )
   in
     ( model, gen )
+
 
 generateModelByType : String -> ExerciseType -> Generator Model
 generateModelByType id t =
@@ -112,6 +123,10 @@ generateByType t =
     AdditionTo10 ->
       (int 1 9)
         |> map (\a -> (a, 10 - a))
+        |> map result
+    SubtractionFrom10 ->
+      (int 1 9)
+        |> map (\a -> (10, a))
         |> map result
 
 
@@ -202,6 +217,7 @@ exerciseType2str t =
     DoubleAddition -> "double_addition"
     DoubleSubtraction -> "double_subtraction"
     AdditionTo10 -> "addition_to_10"
+    SubtractionFrom10 -> "subtraction_from_10"
 
 type2op : ExerciseType -> Operator
 type2op t =
@@ -211,6 +227,7 @@ type2op t =
     DoubleAddition -> Add
     DoubleSubtraction -> Sub
     AdditionTo10 -> Add
+    SubtractionFrom10 -> Sub
 
 type2blank : ExerciseType -> Component
 type2blank t =
@@ -220,6 +237,7 @@ type2blank t =
     DoubleAddition -> Result
     DoubleSubtraction -> Result
     AdditionTo10 -> Num2
+    SubtractionFrom10 -> Num2
 
 component2value : Model -> Component -> Int
 component2value model component =

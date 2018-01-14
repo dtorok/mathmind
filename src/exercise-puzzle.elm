@@ -14,15 +14,27 @@ import Database
 -- DATABASE
 images : List PuzzleExercise.Image
 images =
-  [ PuzzleExercise.initImage "bb8" "https://orig00.deviantart.net/8a1a/f/2015/195/f/0/bb8_animated_gif_by_blue_staple_studios-d9197jh.gif" 960 540 10 1
-  , PuzzleExercise.initImage "po-shifu" "https://i.pinimg.com/736x/97/11/94/9711942852d1a2316bcde5eda2a677ea--kung-fu-panda-room-art.jpg" 720 720 4 5
-  , PuzzleExercise.initImage "bock-bock-bocka" "https://78.media.tumblr.com/59a203738ce4107dc2aeb348d829d289/tumblr_inline_nxgvsrXsGu1salyiw_500.gif" 1000 562 4 4
-  , PuzzleExercise.initImage "mario-rabbids" "https://static.gamespot.com/uploads/scale_super/1552/15524586/3279789-mario-rabbids.jpg" 1000 562 4 6
-  , PuzzleExercise.initImage "po-hit" "https://i.giphy.com/media/YxskfjnmTluKs/giphy.webp" 1000 402 4 6
-  , PuzzleExercise.initImage "spider-sinister6" "https://img00.deviantart.net/3d0b/i/2017/128/f/5/spider_man_chase_by_patrickbrown-db8isc2.jpg" 1280 884 6 6
-  , PuzzleExercise.initImage "vulture-vs-spider" "https://img00.deviantart.net/dfb3/i/2015/217/a/8/vulture_vs_spider_man_by_spidermanfan2099-d94cd35.jpg" 1024 641 5 6
-  , PuzzleExercise.initImage "po-teaches" "https://i.giphy.com/media/CDZs1J3ioQ78k/giphy.webp" 1280 720 4 9
+  [ PuzzleExercise.initImage "5-mario-cap" "https://blogs-images.forbes.com/erikkain/files/2017/10/mario.png" 1280 720 4 6
+  , PuzzleExercise.initImage "5-rayman" "https://i.ytimg.com/vi/afqO1qGr2XM/maxresdefault.jpg" 1280 720 5 4
+  , PuzzleExercise.initImage "5-chain-reaction" "http://www.geekadelphia.com/wp-content/uploads/2015/02/Rube-Goldberg-Machine.jpg " 1024 768 6 6
+  , PuzzleExercise.initImage "5-hakuna-matata" "https://images-production.global.ssl.fastly.net/uploads/posts/image/114847/the-lion-king.gif?auto=compress&crop=top&fit=crop&h=675&q=55&w=1200" 1200 675 4 3
+  , PuzzleExercise.initImage "5-mario-capture" "https://cdn.vox-cdn.com/thumbor/z9KYSVgl2kJxzbsyMUR8UFKOMAA=/56x0:656x400/1310x873/cdn.vox-cdn.com/uploads/chorus_image/image/55236075/super_mario_odyssey.0.gif" 1310 873  5 5
+  , PuzzleExercise.initImage "5-rayman-cover" "https://cdn3.dualshockers.com/wp-content/uploads/2017/07/Rayman-Legends-Definitive-Edition.jpg" 1280 720 4 3
+  , PuzzleExercise.initImage "5-super-mario-domino" "https://laughingsquid.com/wp-content/uploads/2017/10/20000-dominoes-topple-over-in-a-display-designed-to-look-like-popular-gaming-apps1.gif?w=750" 640 360 4 4
+  , PuzzleExercise.initImage "5-nemo-ray" "https://i.giphy.com/media/yoJC2OsrlTiqqwwvWU/giphy.webp" 1280 720 3 3
+  , PuzzleExercise.initImage "5-kayloren-rey" "https://i.giphy.com/media/vOdoGT4nD24Ja/giphy.webp" 1920 1080 6 8
+  , PuzzleExercise.initImage "5-domino" "https://cdn.vox-cdn.com/thumbor/b8MCyCdDUiENhhR_GWtp__dR6ws=/0x0:1800x1200/1400x933/filters:focal(756x456:1044x744):no_upscale()/cdn.vox-cdn.com/uploads/chorus_image/image/56412747/Google_Memo_2.0.gif" 800 533 3 3
   ]
+
+  -- [ PuzzleExercise.initImage "bb8" "https://orig00.deviantart.net/8a1a/f/2015/195/f/0/bb8_animated_gif_by_blue_staple_studios-d9197jh.gif" 960 540 10 1
+  -- , PuzzleExercise.initImage "po-shifu" "https://i.pinimg.com/736x/97/11/94/9711942852d1a2316bcde5eda2a677ea--kung-fu-panda-room-art.jpg" 720 720 4 5
+  -- , PuzzleExercise.initImage "bock-bock-bocka" "https://78.media.tumblr.com/59a203738ce4107dc2aeb348d829d289/tumblr_inline_nxgvsrXsGu1salyiw_500.gif" 1000 562 4 4
+  -- , PuzzleExercise.initImage "mario-rabbids" "https://static.gamespot.com/uploads/scale_super/1552/15524586/3279789-mario-rabbids.jpg" 1000 562 4 6
+  -- , PuzzleExercise.initImage "po-hit" "https://i.giphy.com/media/YxskfjnmTluKs/giphy.webp" 1000 402 4 6
+  -- , PuzzleExercise.initImage "spider-sinister6" "https://img00.deviantart.net/3d0b/i/2017/128/f/5/spider_man_chase_by_patrickbrown-db8isc2.jpg" 1280 884 6 6
+  -- , PuzzleExercise.initImage "vulture-vs-spider" "https://img00.deviantart.net/dfb3/i/2015/217/a/8/vulture_vs_spider_man_by_spidermanfan2099-d94cd35.jpg" 1024 641 5 6
+  -- , PuzzleExercise.initImage "po-teaches" "https://i.giphy.com/media/CDZs1J3ioQ78k/giphy.webp" 1280 720 4 9
+  -- ]
 
   -- [ PuzzleExercise.initImage "shifu" "https://i.ytimg.com/vi/pXExMuZw9eM/maxresdefault.jpg" 1280 720 3 3
   -- , PuzzleExercise.initImage "calvin" "https://vignette.wikia.nocookie.net/candh/images/2/2b/Calvin.jpg/revision/latest" 1024 768 3 4
@@ -229,7 +241,7 @@ updateFireworks : Model -> (Model, Cmd Msg)
 updateFireworks model =
   let model_ =
     if PuzzleExercise.isDone model.puzzle then
-      { model | fireworks = Just "fireworks2.gif" }
+      { model | fireworks = Just "fireworks/4.gif" }
     else
       model
   in
