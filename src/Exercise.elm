@@ -14,23 +14,26 @@ import Database
 type Operator = Add | Sub
 type Evaluation = None | Correct | Wrong
 type Component = Num1 | Num2 | Result
-type ExerciseType = Addition | Subtraction | DoubleAddition | DoubleSubtraction | AdditionTo10 | SubtractionFrom10
+type ExerciseType
+  = Addition
+  | Subtraction
+  | DoubleAddition
+  | DoubleSubtraction
+  | AdditionTo10
+  | SubtractionFrom10
+  | Addition20
+  | Subtraction20
 
 
 exerciseTypes : List ExerciseType
 exerciseTypes =
-  [ Addition
-  , Subtraction
-  , DoubleAddition
-  , DoubleAddition
+  [ AdditionTo10
+  , SubtractionFrom10
   , DoubleSubtraction
-  , DoubleSubtraction
-  , AdditionTo10
-  , AdditionTo10
-  , AdditionTo10
-  , SubtractionFrom10
-  , SubtractionFrom10
-  , SubtractionFrom10
+  , Addition20
+  , Addition20
+  , Subtraction20
+  , Subtraction20
   ]
 
 type alias Model =
@@ -110,6 +113,13 @@ generateByType t =
         |> map result
     Subtraction ->
       pair (int 2 9) (int 2 9)
+        |> map (\(a, b) -> (a + b, b))
+        |> map result
+    Addition20 ->
+      pair (int 10 20) (int 3 20)
+        |> map result
+    Subtraction20 ->
+      pair (int 1 20) (int 5 10)
         |> map (\(a, b) -> (a + b, b))
         |> map result
     DoubleAddition ->
@@ -214,6 +224,8 @@ exerciseType2str t =
   case t of
     Addition -> "addition"
     Subtraction -> "subtraction"
+    Addition20 -> "addition20"
+    Subtraction20 -> "subtraction20"
     DoubleAddition -> "double_addition"
     DoubleSubtraction -> "double_subtraction"
     AdditionTo10 -> "addition_to_10"
@@ -224,6 +236,8 @@ type2op t =
   case t of
     Addition -> Add
     Subtraction -> Sub
+    Addition20 -> Add
+    Subtraction20 -> Sub
     DoubleAddition -> Add
     DoubleSubtraction -> Sub
     AdditionTo10 -> Add
@@ -234,6 +248,8 @@ type2blank t =
   case t of
     Addition -> Result
     Subtraction -> Result
+    Addition20 -> Result
+    Subtraction20 -> Result
     DoubleAddition -> Result
     DoubleSubtraction -> Result
     AdditionTo10 -> Num2
