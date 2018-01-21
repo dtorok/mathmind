@@ -1,4 +1,4 @@
-module App exposing (..)
+module ListGame exposing (..)
 
 import Tuple
 import Task

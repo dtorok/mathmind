@@ -1,4 +1,4 @@
-module PuzzleExercise exposing (..)
+module ImageExercise exposing (..)
 
 import Html exposing (Html, div, img, table, tr, td, text)
 import Html.Attributes exposing (class, src, width, height)

@@ -5,7 +5,10 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "src"
+        "src",
+        "src/platform",
+        "src/games/imagegame",
+        "src/games/listgame"
     ],
     "exposed-modules": [],
     "dependencies": {

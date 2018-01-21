@@ -3,7 +3,7 @@ clean:
 	rm resources/exercise-puzzle.js
 
 build:
-	elm-make src/exercise-puzzle.elm --output resources/exercise-puzzle.js
+	elm-make src/Main.elm --output resources/main.js
 
 open: build
 	open index.html
